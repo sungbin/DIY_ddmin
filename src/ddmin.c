@@ -12,107 +12,117 @@
 int
 split (partition * partitions, char * char_seq, int n);
 
-char *
-complement_seq(partition * partitions, int part_index, int partition_n);
+int
+test_buffer_overflow(char * program_path, char * input_seq_path);
 
 int
-test_buffer_overflow(char * program_path, char * input_seq);
-
-/*
-char *
-ddmin (char * program_path, char * char_seq_path);
-
-typedef struct _partition {
-        int start;
-        int end;
-        char * file_path;
-} partition;
-*/
+split_to_file (char ** partition_path_arr, char * char_seq_path, int n);
 
 // return value: minimum input path
 char *
-ddmin (char * program_path, char * char_seq) {
+ddmin (char * program_path, char * char_seq_path) {
 
 	int seq_len, n = 2;
-	char * sequnce = strdup(char_seq);
+	char * sequence = path_to_str(char_seq_path);
 
 	while ((seq_len = strlen(sequnce)) > 1) {
 
-// 		printf("seq: %s\n", char_seq);
-
-		partition * partitions;
-		partitions = malloc(sizeof(partition) * (seq_len/n + 1));
-		int partition_n = split(partitions, sequnce, n);
+		char ** partition_path_arr = malloc(sizeof(char *) * 512);
+		int splited_n = split_to_file(partition_path_arr, input_path, n);
 
 		int any_failed = 0;
-		for (int i = 0; i < partition_n; i++) {
-			partition p = partitions[i];
+		for (int i = 0; i < splited_n; i++) {
+			
+			char * part_path = partition_path_arr[i];
 
-			if (! test_buffer_overflow(program_path, p.seq)) {
-				sprintf(sequnce, "%s", p.seq);
+			if (! test_buffer_overflow(program_path, part_path)) {
+				sequance = path_to_str(part_path);
 				n = 2;
 				any_failed = 1;
+
 				break;
 			}
 		}
 		if (any_failed) {
-			free(partitions);
+			//TODO: free(partition_path) for each partition_path_arr
 			continue;
 		}
 
 		// any_failed = 0
 		for (int i = 0; i < partition_n; i++) {
-			char * cp_seq = complement_seq(partitions, i, partition_n);
 
-			if (! test_buffer_overflow(program_path, cp_seq)) {
-				sprintf(sequnce, "%s", cp_seq);
+			char * cpart_path = complement_seq(partition_path_arr, splited_n, i);
+
+			if (! test_buffer_overflow(program_path, cpart_path)) {
+				sequance = path_to_str(cpart_path);
 				n = MAX(n-1, 2);
 				any_failed = 1;
+
 				break;
 			}
 		}
 		if (any_failed) {
-			free(partitions);
+			//TODO: free(partition_path) for each partition_path_arr
 			continue;
 		}
 
+		//TODO: free(partition_path) for each partition_path_arr
 		if (seq_len < n) {
-			free(partitions);
 			n = MIN(n*2, seq_len);
 		}
 		else {
-			free(partitions);
 			break;
 		}
 	}
-	return sequnce;
+
+	//TODO: free sequence
+
+	return sequnce; //TODO: save sequence as file, and return the path.
 }
 
 
 int
-split (partition * partitions, char * char_seq, int n) {
+split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
 
-	int part_idx = 0;
-	int seq_len = strlen(char_seq);	
-	int part_size = ceil(seq_len / n);
-	int current_idx = 0;
-	int part_n = 0;
+	FILE * ifp = fopen(char_seq_path, "r");
+	int splited_n = 0;
+	int allocated_file_n = 512;	
 
-	for (int i = 0; i < n; i++) {
-		int start_part = current_idx + i * part_size;
-		int end_part = MIN(current_idx + (i+1)*part_size, seq_len);
+	struct stat _stat;
+	fstat(ifp, &_stat);
+	long f_size = (long) _stat.st_size;
+	int part_size = ceil(f_size / n);
 
-		char * _seq = malloc(sizeof(char) * end_part-start_part);
-		strncpy(_seq, (char_seq+start_part), end_part-start_part);
-		partition p = { .start=start_part, .end=end_part, .seq = _seq };
-		partitions[part_idx] = p;
-		
-		current_idx = end_part;
-		part_n++;
-	}
-	
-	return part_n;
+	char buf[512];
+	int buf_size = 0;
+	int c_idx = 0;
+
+	do {
+
+		buf_size = fread(buf, 1, part_size, ifp);
+
+		if (splited_n > allocated_file_n) {
+			allocated_file_n *= 2;
+			realloc(partition_path_arr, sizeof(char *) * allocated_file_n);
+		}
+
+		partition_path_arr[splited_n] = malloc(sizeof(char) * FILENAME_MAX);
+		sprintf(partition_path_arr[splited_n], "./%d-%d.part", c_idx, (c_idx+buf_size));
+
+		c_idx += buf_size;
+		FILE * out_fp = fopen(partition_path_arr[splited_n], "w");
+
+		splited_n ++;
+		fwrite(buf, 1, buf_size, out_fp);
+		fclose(out_fp);
+
+
+	} while(buf_size > 0);
+
+	fclose(ifp);
+	return splited_n;
 }
+
 
 char *
 complement_seq(partition * partitions, int part_index, int partition_n) {
@@ -130,41 +140,4 @@ complement_seq(partition * partitions, int part_index, int partition_n) {
 	}	
 	
 	return compl;
-}
-
-int
-test_buffer_overflow(char * program_path, char * input_seq) {
-
-	// 0. write input as fie
-	char * input_path = "./input.test";
-	char * output_path = "./output.text";
-	char * output_err_path = "./output_err.text";
-	FILE * input_fw = fopen(input_path, "w");
-	fwrite(input_seq, 1, strlen(input_seq), input_fw);
-	fclose(input_fw);
-
-	// 1. run and print error as file
-
-	//runner (char * target_path, char * input_path, char * output_path, char * output_err_path)	
-	runner(program_path, input_path, output_path, output_err_path);
-	
-	// 2. if size(error_file) > 0, assume buffer overflow
-
-	FILE * output_err_fr = fopen(output_err_path, "r");
-	unsigned char in_buf[512];
-	int buf_size = fread(in_buf, 1, 512, output_err_fr);
-	fclose(output_err_fr);
-
-	// collect garbage files
-	remove(input_path);
-	remove(output_path);
-	remove(output_err_path);
-
-	// if err message exist, assume buffer overflow
-	if (buf_size > 0) {
-		return 1;
-	} 
-	else {
-		return 0;
-	}
 }
