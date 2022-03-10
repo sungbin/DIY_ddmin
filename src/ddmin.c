@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
+// #include <stdio.h>
 #include <math.h>
 
 #include "../include/ddmin.h"
@@ -38,7 +38,7 @@ ddmin (char * program_path, char * char_seq) {
 
 	while ((seq_len = strlen(sequnce)) > 1) {
 
-		printf("seq: %s\n", char_seq);
+// 		printf("seq: %s\n", char_seq);
 
 		partition * partitions;
 		partitions = malloc(sizeof(partition) * (seq_len/n + 1));
