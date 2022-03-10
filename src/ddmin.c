@@ -18,6 +18,18 @@ complement_seq(partition * partitions, int part_index, int partition_n);
 int
 test_buffer_overflow(char * program_path, char * input_seq);
 
+/*
+char *
+ddmin (char * program_path, char * char_seq_path);
+
+typedef struct _partition {
+        int start;
+        int end;
+        char * file_path;
+} partition;
+*/
+
+// return value: minimum input path
 char *
 ddmin (char * program_path, char * char_seq) {
 
