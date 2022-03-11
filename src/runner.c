@@ -44,7 +44,7 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
 
-	int ret = kill(pid, SIGKILL);
+	kill(pid, SIGKILL);
         int status = 0;
 	//waitpid(pid, &status, 0);
 	waitpid(pid, &status, 0);
@@ -57,7 +57,8 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
 	}
 	else {
 
-		runner_error_code error_code = get_error(E_TIMEOUT_KILL, 0);
+		int exit_stated = WEXITSTATUS(status);
+		runner_error_code error_code = get_error(E_TIMEOUT_KILL, exit_stated);
 		return error_code; 
 	}
 
