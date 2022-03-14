@@ -207,7 +207,9 @@ complement_seq_files (int n, char ** seq_file_arr, int arr_len) {
 
 	
 	for (int i = 0; i < arr_len; i++) {
-		fclose(fp_arr[i]);
+		if (fp_arr[i] != 0x0) {
+			fclose(fp_arr[i]);
+		}
 	}
 
 	fclose(out_fp);
