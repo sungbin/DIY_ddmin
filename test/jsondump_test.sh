@@ -2,5 +2,6 @@
 #./make_jsondump.sh
 
 # 2. test main
-../bin/main ./jsondump ./crash.json
 
+rm ./*.part
+../bin/main ./jsondump ./crash.json

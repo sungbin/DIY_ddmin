@@ -1,10 +1,10 @@
-#include <signal.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 
-#include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../include/runner.h"
 
@@ -35,34 +35,34 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         }
         
         /* Parent process */
+        int status = 0;
         int start, end;
         start = ((int)clock()) / CLOCKS_PER_SEC;
         end = ((int)clock()) / CLOCKS_PER_SEC;
 
-        
         while ((end - start) < 1) {
+		int w = waitpid(pid, &status, WNOHANG);
+		if (w != 0) {
+			break;
+		}
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
 
-	kill(pid, SIGKILL);
-        int status = 0;
-	//waitpid(pid, &status, 0);
-	waitpid(pid, &status, 0);
-
-        if (WIFEXITED(status)) {
-
-		int exit_stated = WEXITSTATUS(status);
-		runner_error_code error_code = get_error(NO_ERROR, exit_stated);
+	int exit_stated = WEXITSTATUS(status);
+	if ((end - start) >= 1) {
+		// Time out Kill
+		kill(pid, SIGKILL);
+		wait(&status);
+		runner_error_code error_code = get_error(E_TIMEOUT_KILL, exit_stated);
 		return error_code;
 	}
 	else {
-
-		int exit_stated = WEXITSTATUS(status);
-		runner_error_code error_code = get_error(E_TIMEOUT_KILL, exit_stated);
-		return error_code; 
+		// normally exit
+		runner_error_code error_code = get_error(NO_ERROR, exit_stated);
+		return error_code;
 	}
 
-	/* cannot reach this area*/
+	/* cannot reach this area */
 }
 
 runner_error_code
