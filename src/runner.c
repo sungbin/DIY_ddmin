@@ -2,9 +2,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <sys/errno.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -43,33 +41,26 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         end = ((int)clock()) / CLOCKS_PER_SEC;
 
         while ((end - start) < 1) {
-		waitpid(pid, &status, WNOHANG);
-		if (WIFEXITED(status)) {
+		int w = waitpid(pid, &status, WNOHANG);
+		if (w != 0) {
 			break;
 		}
                 end = ((int)clock()) / CLOCKS_PER_SEC;
 	}
 
-	// TODO:
+	int exit_stated = WEXITSTATUS(status);
 	if ((end - start) >= 1) {
 		// Time out Kill
 		kill(pid, SIGKILL);
-		int exit_stated = WEXITSTATUS(status);
+		wait(&status);
 		runner_error_code error_code = get_error(E_TIMEOUT_KILL, exit_stated);
-
-		printf("kill ERROR: %d\n", errno);
-
 		return error_code;
 	}
 	else {
 		// normally exit
-		int exit_stated = WEXITSTATUS(status);
 		runner_error_code error_code = get_error(NO_ERROR, exit_stated);
-
-		printf("normal ERROR: %d\n", errno);
-
+		return error_code;
 	}
-
 
 	/* cannot reach this area */
 }
