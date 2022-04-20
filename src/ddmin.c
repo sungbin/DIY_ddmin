@@ -15,13 +15,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 int
-test_buffer_overflow (char * program_path, char * input_seq_path);
-
-int
 split_to_file (char ** partition_path_arr, char * char_seq_path, int n);
-
-long
-byte_count_file (char * path);
 
 void
 free_paths (char ** path_arr, int len);
@@ -62,7 +56,6 @@ ddmin (char * program_path, char * byte_seq_path) {
 				
 				minimized_fname = strdup(part_path);
 				remove(part_path);
-
 
 				delete_files(partition_path_arr, splited_n);
 				free_paths(partition_path_arr, splited_n);
@@ -170,10 +163,12 @@ byte_count_file (char * path) {
 
 	struct stat _stat;
         if (stat(path, &_stat) == -1) {
-		fprintf(stderr, "stat errno: %d\n", errno);
+		fprintf(stderr, "stat errno: %d (%s)\n", errno, path);
 		exit(1);
 	}
         long f_size = (long) _stat.st_size;
+
+	fprintf(stderr, "file: %s, %ld\n", path, f_size);
 
 	return f_size;
 }

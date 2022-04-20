@@ -4,4 +4,4 @@
 # 2. test main
 
 rm ./*.part
-../bin/main ./jsondump ./crash.json
+ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../bin/main ./jsondump ./crash.json ddmin
