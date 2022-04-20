@@ -1,0 +1,6 @@
+{": "*",
+  "examples": [
+  ple/*.c"
+  ],
+  "exclude": "test"
+}
