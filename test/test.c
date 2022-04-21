@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../../include/ddmin.h"
+#include "../include/ddmin.h"
+
+int p_no = 0;
+int c_no = 0;
 
 int 
 ddmin_partitions_test ();
@@ -28,7 +31,8 @@ main (int argc, char * argv[]) {
 		printf("failed: ddmin_partitions()\n");
 	}
 	else {
-		printf("# PASS ddmin_partitions() in 88 test cases\n");
+		printf("# PASS split_to_file() in %d test cases\n", p_no);
+		printf("# PASS complement_seq_files() in %d test cases\n", c_no);
 	}
 	
 	// test2
@@ -53,15 +57,16 @@ ddmin_partitions_test () {
 		ret |= _ddmin_partitions_test(file2_name, i);
 	}
 
-	for (int i = 90; i < 250; i++) {
+	for (int i = 90; i < 120; i++) {
 		ret |= _ddmin_partitions_test(file3_name, i);
 	}
-	/*
-	*/
-
+	for (int i = 200; i < 230; i++) {
+		ret |= _ddmin_partitions_test(file3_name, i);
+	}
+	//
 	//Test divide ./5000_char 5000 chars to 514 partitions
 	//ret |= _ddmin_partitions_test(file3_name, 514);
-	for (int i = 500; i < 700; i++) {
+	for (int i = 550; i < 560; i++) {
 		ret |= _ddmin_partitions_test(file3_name, i);
 	}
 	/*
@@ -73,10 +78,12 @@ ddmin_partitions_test () {
 int 
 _ddmin_partitions_test (char * file, int n) {
 
+	p_no++;
+
 	long f_size = byte_count_file(file);
 	int part_size = ceil(f_size / n) + 1;
 
-	fprintf(stdout, "# Test divide %s %ld chars to %d partitions\n", file, f_size, n);
+//	fprintf(stdout, "# Test divide %s %ld chars to %d partitions\n", file, f_size, n);
 
 	char** partitions = malloc(sizeof(char*)*n);
 	for (int i = 0; i < n; i ++) {
@@ -87,8 +94,6 @@ _ddmin_partitions_test (char * file, int n) {
 	long sum_size = 0;
 	for (int i = 0; i < part_n; i++) {
 		char * path = partitions[i];
-		//fprintf(stderr, "path: %s\n", path);
-
 		long size = byte_count_file(path);
 		sum_size += size;
 	}
@@ -105,6 +110,27 @@ _ddmin_partitions_test (char * file, int n) {
 		return 1;
 	}
 
+	// Test complement
+	
+	for (int i = 0; i < part_n; i++) {
+		c_no++;
+		char * path = partitions[i];
+		long s_size = byte_count_file(path);
+	
+		char * com_path = complement_seq_files(i, partitions, part_n);
+		long c_size = byte_count_file(com_path);
+
+		if (f_size != s_size + c_size) {
+			
+			fprintf(stdout, "# Test Fail to divide %s %ld chars to %d partitions\n", file, f_size, n);
+			fprintf(stdout, "f_size: %ld, s_size: %ld, c_size: %ld\n", f_size, s_size , c_size);
+			return 1;
+		}
+
+		free(com_path);
+	}
+
+
 	delete_files(partitions, part_n);
 	free_paths(partitions, part_n);
 
@@ -116,14 +142,14 @@ ddmin_buffer_overflow_test (char * jsonump_path) {
 
 	int ret = 0;
 
-	if (!test_buffer_overflow(jsonump_path, "../crash.json")) {
+	if (!test_buffer_overflow(jsonump_path, "../example/crash.json")) {
 		ret |= 1;
 	}
 
-	if (test_buffer_overflow(jsonump_path, "../library.json")) {
+	if (test_buffer_overflow(jsonump_path, "../example/library.json")) {
 		ret |= 1;
 	}
-	if (!test_buffer_overflow(jsonump_path, "../mymin_result/21")) {
+	if (!test_buffer_overflow(jsonump_path, "../example/mymin_result/21")) {
 		ret |= 1;
 	}
 
