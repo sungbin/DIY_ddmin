@@ -15,7 +15,7 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 all: $(BIN)
 
 $(BIN): $(BINDIR) ddmin mymin main runner
-	$(CC) $(OBJS) -g -o $(BIN)
+	$(CC) $(OBJS) -g -o $(BIN) -lm
 
 $(BINDIR):
 	mkdir -p $(BINDIR)

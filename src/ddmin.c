@@ -7,24 +7,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <float.h>
 
 #include "../include/ddmin.h"
 #include "../include/runner.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
-int
-split_to_file (char ** partition_path_arr, char * char_seq_path, int n);
-
-void
-free_paths (char ** path_arr, int len);
-
-char *
-complement_seq_files (int n, char ** seq_file_arr, int arr_len);
-
-void
-delete_files (char ** path_arr, int arr_len);
 
 int file_no = 1;
 char * minimized_fname;
@@ -168,7 +157,7 @@ byte_count_file (char * path) {
 	}
         long f_size = (long) _stat.st_size;
 
-	fprintf(stderr, "file: %s, %ld\n", path, f_size);
+	//fprintf(stderr, "file: %s, %ld\n", path, f_size);
 
 	return f_size;
 }
@@ -178,6 +167,7 @@ void
 free_paths (char ** path_arr, int len) {
 	for (int i = 0; i < len; i++) {
 		char * path = path_arr[i];
+		//TODO: not target remove in path_arr
 		if (path != 0x0) {
 			free(path);
 		}
@@ -190,9 +180,6 @@ void
 delete_files (char ** path_arr, int arr_len) {
 
 	for (int i = 0; i < arr_len; i++) {
-		if (strcmp(path_arr[i], minimized_fname) == 0) {
-			continue;
-		}
 		remove(path_arr[i]);
 	}
 }
@@ -200,25 +187,43 @@ delete_files (char ** path_arr, int arr_len) {
 int
 test_buffer_overflow (char * program_path, char * input_seq_path) {
 	
+	char error_message[256] = "in dump example/jsondump.c:44";
+
 	runner_error_code error_code = runner(program_path, input_seq_path, "./program.strout", "./program.strerr");
+
+	if (error_code.exit_code != 1) {
+		remove("./program.strout");
+		remove("./program.strerr");
+		return 0;
+	}
+
+	FILE * fp = fopen("./program.strerr", "rb");
+
+	char line[512];
+	while (fgets(line, 512, fp) != 0x0) {
+		if (strstr(line, error_message) != 0x0) {
+			fclose(fp);
+			remove("./program.strout");
+			remove("./program.strerr");
+			//fprintf(stderr, "find!\n");
+			return 1;
+		}
+	}
+
+	fclose(fp);
 	remove("./program.strout");
 	remove("./program.strerr");
 
-	return error_code.exit_code;
+	return 0;
 }
 
 int
 split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
 
-        FILE * ifp = fopen(char_seq_path, "r");
+        FILE * ifp = fopen(char_seq_path, "rb");
         int splited_n = 0;
-        int allocated_file_n = 512;
 
-	struct stat _stat;
-	int fd = fileno(ifp);
-        fstat(fd, &_stat);
-        long f_size = (long) _stat.st_size;
-        int part_size = ceil(f_size / n);
+	long f_size = byte_count_file(char_seq_path);
 
         char buf[512];
         int buf_size = 0;
@@ -226,16 +231,15 @@ split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
 
         do {
 
+		//fprintf(stderr,"\t @ @\n");
+        	int part_size = ceilf((float)f_size / (float)n);
+		//fprintf(stderr, "part_size: %d (%ld/%d)\n", part_size, f_size, n);
+
                 buf_size = fread(buf, 1, part_size, ifp);
 
 		if (buf_size <= 0) {
 			break;
 		}
-
-                if (splited_n > allocated_file_n) {
-                        allocated_file_n *= 2;
-                        partition_path_arr = realloc(partition_path_arr, sizeof(char *) * allocated_file_n);
-                }
 
                 partition_path_arr[splited_n] = malloc(sizeof(char) * FILENAME_MAX);
                 sprintf(partition_path_arr[splited_n], "./%d.part", file_no);
@@ -248,8 +252,10 @@ split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
                 fwrite(buf, 1, buf_size, out_fp);
                 fclose(out_fp);
 
+		n = n-1;
+		f_size -= part_size;
 
-        } while(buf_size > 0);
+        } while(n > 0);
 
         fclose(ifp);
         return splited_n;
