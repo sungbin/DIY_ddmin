@@ -16,7 +16,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 int file_no = 1;
-char * minimized_fname;
+char * minimized_fname = 0x0;
 
 // return value: minimum input path
 char *
@@ -44,7 +44,6 @@ ddmin (char * program_path, char * byte_seq_path) {
 			if (e_code == 1) {
 				
 				minimized_fname = strdup(part_path);
-				remove(part_path);
 
 				delete_files(partition_path_arr, splited_n);
 				free_paths(partition_path_arr, splited_n);
@@ -167,7 +166,6 @@ void
 free_paths (char ** path_arr, int len) {
 	for (int i = 0; i < len; i++) {
 		char * path = path_arr[i];
-		//TODO: not target remove in path_arr
 		if (path != 0x0) {
 			free(path);
 		}
@@ -180,6 +178,9 @@ void
 delete_files (char ** path_arr, int arr_len) {
 
 	for (int i = 0; i < arr_len; i++) {
+		if (strcmp(minimized_fname, path_arr[i]) == 0) {
+			continue;
+		}
 		remove(path_arr[i]);
 	}
 }

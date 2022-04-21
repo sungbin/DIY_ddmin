@@ -7,7 +7,7 @@ cd ..
 make clean
 make
 
-cd test/
+cd example/
 
 rm ./*.part
 ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../bin/main ./jsondump ./crash.json ddmin
