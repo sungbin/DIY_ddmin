@@ -16,6 +16,9 @@ int
 ddmin_buffer_overflow_test (char * jsonump_path);
 
 int
+ddmin_result_test (char * jsonump_path);
+
+int
 main (int argc, char * argv[]) {
 
 	if (argc < 2) {
@@ -26,7 +29,7 @@ main (int argc, char * argv[]) {
 	int fail = 0;
 
 	// test1
-	fail = ddmin_partitions_test();
+	//fail = ddmin_partitions_test();
 	if (fail) {
 		printf("failed: ddmin_partitions()\n");
 	}
@@ -40,15 +43,25 @@ main (int argc, char * argv[]) {
 	if (fail) {
 		printf("failed: ddmin_buffer_overflow()\n");
 	}
+	else {
+		printf("# PASS ddmin_buffer_overflow() in 3 test cases\n");
+	}
 
+	fail = ddmin_result_test(argv[1]);
+	if (fail) {
+		printf("failed: ddmin_result_test \n");
+	}
+	else {
+		printf("# PASS ddmin_buffer_overflow() in 6 test cases\n");
+	}
 }
 
 int
 ddmin_partitions_test () {
 
-	char * file1_name = "./90_char";
-	char * file2_name = "./100_char";
-	char * file3_name = "./5000_char";
+	char * file1_name = "./input/90_char";
+	char * file2_name = "./input/100_char";
+	char * file3_name = "./input/5000_char";
 
 	int ret = 0;
 
@@ -69,8 +82,6 @@ ddmin_partitions_test () {
 	for (int i = 550; i < 560; i++) {
 		ret |= _ddmin_partitions_test(file3_name, i);
 	}
-	/*
-	*/
 
 	return ret;
 }
@@ -106,7 +117,7 @@ _ddmin_partitions_test (char * file, int n) {
 	if (sum_size != f_size) {
 		fprintf(stdout, "# Test divide %s %ld chars to %d partitions\n", file, f_size, n);
 		fprintf(stdout, "fail to part %s when n is %d\n", file, n);
-		fprintf(stdout, "sum_size: %ld, f_size: %ld\n", sum_size, f_size);
+		fprintf(stderr, "sum_size: %ld, f_size: %ld\n", sum_size, f_size);
 		return 1;
 	}
 
@@ -123,7 +134,7 @@ _ddmin_partitions_test (char * file, int n) {
 		if (f_size != s_size + c_size) {
 			
 			fprintf(stdout, "# Test Fail to divide %s %ld chars to %d partitions\n", file, f_size, n);
-			fprintf(stdout, "f_size: %ld, s_size: %ld, c_size: %ld\n", f_size, s_size , c_size);
+			fprintf(stderr, "f_size: %ld, s_size: %ld, c_size: %ld\n", f_size, s_size , c_size);
 			return 1;
 		}
 
@@ -142,7 +153,7 @@ ddmin_buffer_overflow_test (char * jsonump_path) {
 
 	int ret = 0;
 
-	if (!test_buffer_overflow(jsonump_path, "../example/crash.json")) {
+	if (!test_buffer_overflow(jsonump_path, "./input/crash.json")) {
 		ret |= 1;
 	}
 
@@ -154,4 +165,63 @@ ddmin_buffer_overflow_test (char * jsonump_path) {
 	}
 
 	return ret;
+}
+
+int
+ddmin_result_test (char * jsonump_path) {
+
+	char * in_file;
+       	char * minimized_path;
+
+	in_file = "./input/f_6";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 6l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+
+	in_file = "./input/f_12_1";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 6l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+	
+	in_file = "./input/f_12_2";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 6l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+
+	in_file = "./input/f_7";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 6l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+
+	in_file = "./input/f_11";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 6l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+
+	in_file = "./input/f_8";
+	minimized_path = ddmin(jsonump_path, in_file);
+	if (byte_count_file(minimized_path) != 8l) {
+		fprintf(stdout, "# Test Fail to ddmin on %s\n", in_file);
+		return 1;
+	}
+	free(minimized_path);
+
+
+
+	return 0;
 }
