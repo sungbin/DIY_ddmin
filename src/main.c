@@ -9,6 +9,9 @@
 char *
 read_file (char * input_path);
 
+extern int file_no;
+extern int iter_no;
+
 int
 main (int argc, char * argv[]) {
 	
@@ -23,6 +26,7 @@ main (int argc, char * argv[]) {
 	char * result;
 	if(argv[3][0]=='d') {
 		result = ddmin(argv[1], argv[2]);
+		printf("The times of execute %d, iteration: %d \n", file_no-1, iter_no);
 	}
 	else if(argv[3][0]=='m') {
 		result = mymin(argv[1], argv[2]);

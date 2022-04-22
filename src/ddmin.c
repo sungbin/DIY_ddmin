@@ -16,6 +16,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 int file_no = 1;
+int iter_no = 0;
 char * minimized_fname = 0x0;
 
 // return value: minimum input path
@@ -27,7 +28,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 	minimized_fname = strdup(byte_seq_path);
 	while ((seq_len = byte_count_file(minimized_fname)) > 1) {
 
-		fprintf(stderr, "len: %ld, n: %d, path: %s\n", seq_len, n, minimized_fname);
+		fprintf(stderr, "len: %ld, n: %d, path: %s, iteration: %d\n", seq_len, n, minimized_fname, ++iter_no);
 
 		char ** partition_path_arr = malloc(sizeof(char *) * 512);
 		int splited_n = split_to_file(partition_path_arr, minimized_fname, n);
@@ -44,7 +45,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 			if (e_code == 1) {
 				
 				minimized_fname = strdup(part_path);
-				printf("last minimized: %s\n", minimized_fname);
+				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
 				delete_files(partition_path_arr, splited_n);
 				free_paths(partition_path_arr, splited_n);
@@ -73,7 +74,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 
 				free(minimized_fname);
 				minimized_fname = strdup(cpart_path);
-				printf("last minimized: %s\n", minimized_fname);
+				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
 				free(cpart_path);
 				delete_files(partition_path_arr, splited_n);

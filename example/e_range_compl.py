@@ -4,6 +4,9 @@ import os
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 
+t_no = 1
+i_no = 0
+
 err_msg = "in dump example/jsondump.c:44"
 
 my_env = os.environ.copy()
@@ -11,23 +14,25 @@ my_env["ASAN_OPTIONS"] = "detect_leaks=0:halt_on_error=1"
 
 sys.setrecursionlimit(10**6)
 
-def test_jsondump(jsondump_path, in_str):
+def is_fail(jsondump_path, in_str):
 
     p = Popen([jsondump_path], stdout=PIPE, stdin=PIPE, stderr=STDOUT, env=my_env)
     p.stdin.write(in_str.encode("utf-8"))
     out = p.communicate()[0].decode("utf-8")
 
+    #print("meg:", out)
+
     return err_msg in out
 
 
 def test():
-    fail = test_jsondump("./jsondump", "./crash.json")
+    fail = is_fail("./jsondump", "./crash.json")
     if fail:
         print("PASS!")
     else:
         print("FAIL!")
     
-    fail = test_jsondump("./jsondump", "./library.json")
+    fail = is_fail("./jsondump", "./library.json")
     if not fail:
         print("PASS!")
     else:
@@ -35,11 +40,12 @@ def test():
 
 
 def mymin(file_name):
+    global t_no, i_no
     fp = open(file_name, "r")
     mtr = fp.read()
     fp.close()
 
-    print("minimized: ", file_name, len(mtr))
+    print("minimized:", file_name, ", len:", len(mtr), ", test cnt:", t_no, "iteration:", i_no)
 
     if len(mtr) < 2:
         return file_name
@@ -47,27 +53,41 @@ def mymin(file_name):
         return _mymin(mtr, len(mtr)-1, 0)
 
 def _mymin(t, r_size, r_begin):
+    global t_no, i_no
     r_end = r_begin + r_size
     if r_end > len(t):
         if r_size == 1:
             return
         else:
+            i_no = i_no + 1
             _mymin(t, r_size-1, 0)
             return
 
-    #e_partion = t[r_begin:r_end]
+    e_partion = t[r_begin:r_end]
     partition = t[0:r_begin] + t[r_end:]
 
-    if test_jsondump(jsondump_path, partition):
+    t_no = t_no + 1
+    if is_fail(jsondump_path, partition):
         name = "./"+str(r_size)+ "_"+ str(r_begin) + ".part"
         fp = open(name, "w")
         fp.write(partition)
         fp.close()
+        i_no = i_no + 1
         return mymin(name)
+
+    t_no = t_no + 1
+    if is_fail(jsondump_path, e_partion):
+        name = "./"+str(r_size)+ "_"+ str(r_begin) + "_com.part"
+        fp = open(name, "w")
+        fp.write(e_partion)
+        fp.close()
+        i_no = i_no + 1
+        return mymin(name)
+
 
     _mymin(t, r_size, r_begin+1)
 
-def test_jsondump_path(jsondump_path, in_path):
+def is_fail_path(jsondump_path, in_path):
 
     fp = open(in_path, "rb")
     in_byte = fp.read()
