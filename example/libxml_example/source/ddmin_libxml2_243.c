@@ -9,8 +9,9 @@
 #include <math.h>
 #include <float.h>
 
-#include "../include/ddmin.h"
-#include "../include/runner.h"
+#include "../../../include/ddmin.h"
+
+#include "../../../include/runner.h"
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -28,7 +29,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 	minimized_fname = strdup(byte_seq_path);
 	while ((seq_len = byte_count_file(minimized_fname)) > 1) {
 
-		fprintf(stderr, "len: %ld, n: %d, path: %s, iteration: %d\n", seq_len, n, minimized_fname, ++iter_no);
+		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", seq_len, n, minimized_fname, file_no);
 
 		char ** partition_path_arr = malloc(sizeof(char *) * n);
 		int splited_n = split_to_file(partition_path_arr, minimized_fname, n);
@@ -38,16 +39,18 @@ ddmin (char * program_path, char * byte_seq_path) {
 			char * part_path = partition_path_arr[i];
 
 			if (access(part_path, F_OK ) != 0) {
-				continue;
+				fprintf(stderr,"not exists part_path \n");
+				exit(1);
 			}
 
+			//fprintf(stderr, "test %s with %s \n", program_path, part_path);
 			int e_code = test_buffer_overflow(program_path, part_path);
 			if (e_code == 1) {
 				
 				minimized_fname = strdup(part_path);
 				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
-				delete_files(partition_path_arr, splited_n);
+				//delete_files(partition_path_arr, splited_n);
 				free_paths(partition_path_arr, splited_n);
 
 				n = 2;
@@ -66,7 +69,8 @@ ddmin (char * program_path, char * byte_seq_path) {
 
 			char * cpart_path = complement_seq_files(i, partition_path_arr, splited_n);
 			if (access(cpart_path, F_OK ) != 0) {
-				continue;
+				fprintf(stderr,"not exists cpart_path \n");
+				exit(1);
 			} 
 
 			int e_code = test_buffer_overflow(program_path, cpart_path);
@@ -77,7 +81,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
 				free(cpart_path);
-				delete_files(partition_path_arr, splited_n);
+				//delete_files(partition_path_arr, splited_n);
 				free_paths(partition_path_arr, splited_n);
 
 				n = MAX(n-1, 2);
@@ -85,7 +89,7 @@ ddmin (char * program_path, char * byte_seq_path) {
 
 				break;
 			} else {
-				remove(cpart_path);
+				//remove(cpart_path);
 				free(cpart_path);
 			}
 		}
@@ -117,7 +121,7 @@ complement_seq_files (int n, char ** seq_file_arr, int arr_len) {
 	}
 
 	char * compl = malloc(sizeof(char) * FILENAME_MAX);
-	sprintf(compl, "./%d.part", file_no);
+	sprintf(compl, "./_%d.part", file_no);
 	file_no++;
 	
 	// merge sequence files	except for index-n
@@ -191,34 +195,34 @@ delete_files (char ** path_arr, int arr_len) {
 int
 test_buffer_overflow (char * program_path, char * input_seq_path) {
 	
-	char error_message[256] = "in dump example/jsondump.c:44";
+	char error_message[256] = "==Hint: address points to the zero page.";
 
 	runner_error_code error_code = runner(program_path, input_seq_path, "./program.strout", "./program.strerr");
 
-	if (error_code.exit_code != 1) {
-		remove("./program.strout");
-		remove("./program.strerr");
-		return 0;
-	}
+        if (error_code.exit_code != 1) {
+                remove("./program.strout");
+                remove("./program.strerr");
+                return 0;
+        }
 
-	FILE * fp = fopen("./program.strerr", "rb");
+        FILE * fp = fopen("./program.strerr", "rb");
 
-	char line[512];
-	while (fgets(line, 512, fp) != 0x0) {
-		if (strstr(line, error_message) != 0x0) {
-			fclose(fp);
-			remove("./program.strout");
-			remove("./program.strerr");
-			//fprintf(stderr, "find!\n");
-			return 1;
-		}
-	}
+        char line[512];
+        while (fgets(line, 512, fp) != 0x0) {
+                if (strstr(line, error_message) != 0x0) {
+                        fclose(fp);
+                        remove("./program.strout");
+                        remove("./program.strerr");
+                        return 1;
+                }
+        }
 
-	fclose(fp);
-	remove("./program.strout");
-	remove("./program.strerr");
+        fclose(fp);
+        remove("./program.strout");
+        remove("./program.strerr");
 
-	return 0;
+        return 0;
+
 }
 
 int

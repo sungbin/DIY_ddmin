@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "../include/ddmin.h"
-#include "../include/mymin.h"
 #include "../include/runner.h"
+#include "../include/range.h"
 
 char *
 read_file (char * input_path);
@@ -27,12 +27,13 @@ main (int argc, char * argv[]) {
 	if(argv[3][0]=='d') {
 		result = ddmin(argv[1], argv[2]);
 		printf("The times of execute %d, iteration: %d \n", file_no-1, iter_no);
+		printf("applied ddmin result: %s\n", result);
 	}
-	else if(argv[3][0]=='m') {
-		result = mymin(argv[1], argv[2]);
+	else if(argv[3][0]=='r') {
+		result = range(argv[1], argv[2]);
+		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
+		printf("applied range result: %s\n", result);
 	}
-
-	printf("applied ddmin result: %s\n", result);
 
 	free(result);
 	return 0;

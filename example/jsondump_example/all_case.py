@@ -29,7 +29,8 @@ def sub_str(val, in_str):
     return my_str
 
 
-in_str = "{\"\"*,s [c]\"\"t}"
+#in_str = "{\"\"*,s [c]\"\"t}"
+in_str = "{l * s [/]e:t}"
 s_len = len(in_str)
 
 b_len = pow(2, s_len)
