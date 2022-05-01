@@ -15,7 +15,7 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-int file_no = 1;
+int file_no = 0;
 int iter_no = 0;
 char * minimized_fname = 0x0;
 
@@ -23,146 +23,206 @@ char * minimized_fname = 0x0;
 char *
 ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 
-	long seq_len;
+	if (access(program_path, F_OK)) {
+		fprintf(stderr, "no program path: %s\n", program_path);
+		exit(1);
+	}
+
+	if (access(byte_seq_path, F_OK)) {
+		fprintf(stderr, "no input path: %s\n", byte_seq_path);
+		exit(1);
+	}
+
+	long f_size;
 	int n = 2;
-	minimized_fname = strdup(byte_seq_path);
-	while ((seq_len = byte_count_file(minimized_fname)) > 1) {
+	minimized_fname = malloc(sizeof(char)*256);
+	strcpy(minimized_fname, byte_seq_path);
 
-		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", seq_len, n, minimized_fname, file_no);
+	while ((f_size = byte_count_file(minimized_fname)) > 1) {
+		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, iter_no);
 
-		char ** partition_path_arr = malloc(sizeof(char *) * n);
-		int splited_n = split_to_file(partition_path_arr, minimized_fname, n);
+		FILE * in_fp = fopen(minimized_fname, "rb");
+		if (in_fp == 0x0) {
+			perror("in_fp");
+			fprintf(stderr, "in_fp: minimized_fname:%s\n",minimized_fname);
+			exit(1);
+		}
 
 		int any_failed = 0;
+		char out_file[256];
+		sprintf(out_file, "./%d.part", ++iter_no);
+
 		
+		FILE * out_fp = fopen(out_file, "wb");
+		if (out_fp == 0x0) {
+			perror("out_fp");
+			fprintf(stderr, "out_fp: out_file:%s\n", out_file);
+			exit(1);
+		}
+		int in_fd = fileno(in_fp);
+		int out_fd = fileno(out_fp);
 
-		for (int i = 0; i < splited_n; i++) {
-			char * part_path = partition_path_arr[i];
+		int _f_size = f_size;
+		int _n = n;
+		do {
 
-			if (access(part_path, F_OK ) != 0) {
-				fprintf(stderr,"not exists part_path \n");
+			file_no++;
+
+			int part_size = ceilf((float)_f_size / (float)_n);
+			
+			if (ftruncate(out_fd, 0) == -1) {
+				perror("ftruncate error in reduce_to_complement");
 				exit(1);
 			}
 
-			//fprintf(stderr, "test %s with %s \n", program_path, part_path);
-			int e_code = test_buffer_overflow(program_path, part_path, err_msg);
-			if (e_code == 1) {
+			lseek(out_fd, 0, SEEK_SET);
+			int _part_size = part_size;
+			while (_part_size > 0) {
 				
-				minimized_fname = strdup(part_path);
-				fprintf(stderr, "last minimized: %s\n", minimized_fname);
+				char buf[2048];
+				int buf_size;
+				if (_part_size < 2048) {
+			       		buf_size = fread(buf, 1, _part_size, in_fp);
+				}
+				else {
+					buf_size = fread(buf, 1, 2048, in_fp);
+				}
+				_part_size -= buf_size;
 
-				//delete_files(partition_path_arr, splited_n);
-				free_paths(partition_path_arr, splited_n);
+				buf_size = fwrite(buf, 1, buf_size, out_fp);
+				fprintf(stderr, "part %d:%d %s\n", file_no, buf_size, buf);
+			}
+			_f_size -= part_size;
+
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
+			
+			long bt;
+			if ((bt = byte_count_file(out_file)) != part_size) {
+				fprintf(stderr, "ERROR: reduce_to_subset\n");
+				fprintf(stderr, "outfile: %ld,  p_size: %d\n", bt, part_size);
+				exit(1);
+			}
+
+			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
+			if (e_code == 1) {
+				strcpy(minimized_fname, out_file);
+				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
 				n = 2;
 				any_failed = 1;
-
 				break;
 			}
-		}
+			_n --;
+
+		} while (_n > 0);
+
+		
 		if (any_failed) {
+			fclose(in_fp);
+			fclose(out_fp);
+			strcpy(minimized_fname, out_file);
 			continue;
 		}
 
+		int c_start = 0;
+		any_failed = 0;
+		_n = n;
+		do {
+			
+			file_no++;
 
-		// any_failed = 0
-		for (int i = 0; i < splited_n; i++) {
+			int part_size = ceilf((float)(f_size - c_start) / (float)_n);
+			int c_end = c_start + part_size;
 
-			char * cpart_path = complement_seq_files(i, partition_path_arr, splited_n);
-			if (access(cpart_path, F_OK ) != 0) {
-				fprintf(stderr,"not exists cpart_path \n");
+			if (ftruncate(out_fd, 0) == -1) {
+				perror("ftruncate error in reduce_to_complement");
 				exit(1);
-			} 
+			}
 
-			int e_code = test_buffer_overflow(program_path, cpart_path, err_msg);
+			lseek(in_fd, 0, SEEK_SET);
+			lseek(out_fd, 0, SEEK_SET);
+			while (c_start > 0) {
+
+				char buf[2048];
+				int buf_size;
+				if (c_start < 2048) {
+			       		buf_size = fread(buf, 1, c_start, in_fp);
+				}
+				else {
+					buf_size = fread(buf, 1, 2048, in_fp);
+				}
+				c_start -= buf_size;
+				fprintf(stderr, "cpart %d:%d %s\n", file_no, buf_size, buf);
+				fwrite(buf, 1, buf_size, out_fp);
+
+			}
+
+			lseek(in_fd, part_size, SEEK_CUR);
+
+			long _f_size = f_size - c_end;
+
+			while (_f_size > 0) {
+
+				char buf[2048];
+				int buf_size;
+				if (_f_size < 2048) {
+			       		buf_size = fread(buf, 1, _f_size, in_fp);
+				}
+				else {
+					buf_size = fread(buf, 1, 2048, in_fp);
+				}
+				_f_size -= buf_size;
+				fprintf(stderr, "cpart %d:%d %s\n", file_no, buf_size, buf);
+				fwrite(buf, 1, buf_size, out_fp);
+			}
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
+
+			if (byte_count_file(out_file) != (f_size - part_size)) {
+				fprintf(stderr, "ERROR: reduce_to_complement\n");
+				fprintf(stderr, "outfile: %ld,  p_size: %ld\n", byte_count_file(out_file), (f_size - part_size));
+				exit(1);
+			}
+
+			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
 			if (e_code == 1) {
-
-				free(minimized_fname);
-				minimized_fname = strdup(cpart_path);
+				strcpy(minimized_fname, out_file);
 				fprintf(stderr, "last minimized: %s\n", minimized_fname);
 
-				free(cpart_path);
-				//delete_files(partition_path_arr, splited_n);
-				free_paths(partition_path_arr, splited_n);
-
-				n = MAX(n-1, 2);
+				n = 2;
 				any_failed = 1;
-
 				break;
-			} else {
-				//remove(cpart_path);
-				free(cpart_path);
 			}
-		}
+			c_start = c_end;
+			_n --;
+
+		} while (c_start < f_size);
+
 		if (any_failed) {
+			fclose(in_fp);
+			fclose(out_fp);
+			strcpy(minimized_fname, out_file);
 			continue;
 		}
+		
+		fclose(in_fp);
+		fclose(out_fp);
 
-		free_paths(partition_path_arr, splited_n);
-		if (seq_len > n) {
-			n = MIN(n*2, seq_len);
+		if (f_size > n) {
+			n = MIN(n*2, f_size);
 		}
 		else {
-			fprintf(stderr,"len: %ld, n: %d\n", seq_len, n);
+			fprintf(stderr,"len: %ld, n: %d\n", f_size, n);
 			break;
 		}
 	}
 
 	return minimized_fname; 
-}
-
-
-
-char *
-complement_seq_files (int n, char ** seq_file_arr, int arr_len) {
-
-	FILE ** fp_arr = malloc(sizeof(FILE *) * arr_len);
-
-	for (int i = 0; i < arr_len; i++) {
-		fp_arr[i] = fopen(seq_file_arr[i], "rb");
-		if (fp_arr[i] == 0x0) {
-			perror("complement_seq_files() fp_arr[i]");
-			exit(1);
-		}
-	}
-
-	char * compl = malloc(sizeof(char) * FILENAME_MAX);
-	sprintf(compl, "./%d.part", file_no);
-	file_no++;
-	
-	// merge sequence files	except for index-n
-	char buf[512];
-	int buf_size;
-	FILE * out_fp = fopen(compl, "wb");
-
-	if (out_fp == 0x0) {
-		fprintf(stderr, "ERROR: fopen write %s\n", compl);
-		perror("msg");
-		exit(1);
-	}
-
-	for (int i = 0; i < arr_len; i++) {
-		if (i == n) {
-			continue;
-		}
-
-        	do {
-			FILE * ifp = fp_arr[i];
-                	buf_size = fread(buf, 1, 511, ifp);
-                	fwrite(buf, 1, buf_size, out_fp);
-	        } while (buf_size > 0);
-	}
-
-	
-	for (int i = 0; i < arr_len; i++) {
-		if (fp_arr[i] != 0x0) {
-			fclose(fp_arr[i]);
-		}
-	}
-
-	fclose(out_fp);
-
-	return compl;
 }
 
 long
@@ -178,30 +238,6 @@ byte_count_file (char * path) {
 	//fprintf(stderr, "file: %s, %ld\n", path, f_size);
 
 	return f_size;
-}
-
-
-void
-free_paths (char ** path_arr, int len) {
-	for (int i = 0; i < len; i++) {
-		char * path = path_arr[i];
-		if (path != 0x0) {
-			free(path);
-		}
-	}
-	free(path_arr);
-}
-
-
-void
-delete_files (char ** path_arr, int arr_len) {
-
-	for (int i = 0; i < arr_len; i++) {
-		if (minimized_fname != 0x0 && strcmp(minimized_fname, path_arr[i]) == 0) {
-			continue;
-		}
-		remove(path_arr[i]);
-	}
 }
 
 int
@@ -233,61 +269,4 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 
         return 0;
 
-}
-
-int
-split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
-
-        FILE * ifp = fopen(char_seq_path, "rb");
-	if (ifp == 0x0) {
-		perror("split_to_file() ifp");
-		exit(1);
-	}
-        int splited_n = 0;
-
-	long f_size = byte_count_file(char_seq_path);
-
-        char buf[512];
-        int buf_size = 0;
-        int c_idx = 0;
-
-	do {
-		
-
-		int part_size = ceilf((float)f_size / (float)n);
-
-		partition_path_arr[splited_n] = malloc(sizeof(char) * FILENAME_MAX);
-                sprintf(partition_path_arr[splited_n], "./%d.part", file_no);
-		file_no++;
-
-                c_idx += buf_size;
-                FILE * out_fp = fopen(partition_path_arr[splited_n], "wb");
-		if (out_fp == 0x0) {
-			perror("split_to_file() out_fp");
-			exit(1);
-		}
-                splited_n ++;
-
-		f_size -= part_size;
-		while (part_size > 0) {
-
-			if (part_size < 512) {
-				buf_size = fread(buf, 1, part_size, ifp);
-			}
-			else {
-				buf_size = fread(buf, 1, 511, ifp);
-			}
-
-			fwrite(buf, 1, buf_size, out_fp);
-			part_size -= buf_size;
-		}
-		
-		fclose(out_fp);
-		n = n-1;
-
-	} while (n > 0);
-
-        fclose(ifp);
-
-        return splited_n;
 }

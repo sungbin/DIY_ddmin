@@ -35,7 +35,9 @@ main (int argc, char * argv[]) {
 		printf("applied range result: %s\n", result);
 	}
 
-	free(result);
+	if (result != argv[2]) {
+		free(result);
+	}
 	return 0;
 }
 
