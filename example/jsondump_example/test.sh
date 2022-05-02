@@ -20,5 +20,5 @@ rm -r result_range
 mkdir result_range
 cd result_range
 rm ./*.part
-ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../../../bin/main ../jsondump ../crash.json range "dump example/jsondump.c:44" | tee ret_ddmin
+ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../../../bin/main ../jsondump ../crash.json range "dump example/jsondump.c:44" | tee ret_range
 cd ..

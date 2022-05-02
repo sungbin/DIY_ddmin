@@ -1,169 +1,51 @@
-last minimized: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, 64
-rs:63
-rs:62
-rs:61
-rs:60
-rs:59
-rs:58
-rs:57
-rs:56
-rs:55
-rs:54
-rs:53
-rs:52
-rs:51
-rs:50
-rs:49
-rs:48
-rs:47
-rs:46
-rs:45
-rs:44
-rs:43
-rs:42
-rs:41
-rs:40
-rs:39
-rs:38
-rs:37
-rs:36
-rs:35
-rs:34
-rs:33
-rs:32
-rs:31
-rs:30
-rs:29
-rs:28
-rs:27
-last minimized: ./1.part, 37
-rs:36
-rs:35
-rs:34
-rs:33
-rs:32
-rs:31
-rs:30
-rs:29
-rs:28
-rs:27
-rs:26
-rs:25
-rs:24
-rs:23
-rs:22
-rs:21
-rs:20
-rs:19
-rs:18
-rs:17
-rs:16
-rs:15
-rs:14
-rs:13
-rs:12
-rs:11
-rs:10
-rs:9
-rs:8
-rs:7
-rs:6
-rs:5
-rs:4
-last minimized: ./2.part, 33
-rs:32
-rs:31
-rs:30
-rs:29
-rs:28
-rs:27
-rs:26
-rs:25
-rs:24
-rs:23
-rs:22
-rs:21
-rs:20
-rs:19
-rs:18
-rs:17
-rs:16
-rs:15
-rs:14
-rs:13
-rs:12
-rs:11
-rs:10
-rs:9
-rs:8
-rs:7
-rs:6
-rs:5
-rs:4
-rs:3
-rs:2
-rs:1
-last minimized: ./3.part, 32
-rs:31
-rs:30
-rs:29
-rs:28
-rs:27
-rs:26
-rs:25
-rs:24
-rs:23
-rs:22
-rs:21
-rs:20
-rs:19
-rs:18
-rs:17
-rs:16
-rs:15
-rs:14
-rs:13
-rs:12
-rs:11
-rs:10
-rs:9
-rs:8
-rs:7
-rs:6
-rs:5
-rs:4
-rs:3
-rs:2
-rs:1
-last minimized: ./4.part, 31
-rs:30
-rs:29
-rs:28
-rs:27
-rs:26
-rs:25
-rs:24
-rs:23
-rs:22
-rs:21
-rs:20
-rs:19
-rs:18
-rs:17
-rs:16
-rs:15
-rs:14
-rs:13
-rs:12
-rs:11
-rs:10
-rs:9
-rs:8
-rs:7
-rs:6
-rs:5
-rs:4
-rs:3
-rs:2
-rs:1
-result: ./4.part
+len: 313, n: 2, path: ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1, file_no: 0
+len: 313, n: 4, path: ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1, file_no: 0
+len: 313, n: 8, path: ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1, file_no: 0
+last minimized: ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1
+len: 274, n: 7, path: ./3.part, file_no: 0
+last minimized: ./3.part
+len: 235, n: 6, path: ./4.part, file_no: 0
+len: 235, n: 12, path: ./4.part, file_no: 0
+last minimized: ./4.part
+len: 216, n: 11, path: ./6.part, file_no: 0
+len: 216, n: 22, path: ./6.part, file_no: 0
+len: 216, n: 44, path: ./6.part, file_no: 0
+last minimized: ./6.part
+len: 211, n: 43, path: ./9.part, file_no: 0
+last minimized: ./9.part
+len: 206, n: 42, path: ./10.part, file_no: 0
+last minimized: ./10.part
+len: 201, n: 41, path: ./11.part, file_no: 0
+last minimized: ./11.part
+len: 196, n: 40, path: ./12.part, file_no: 0
+last minimized: ./12.part
+len: 191, n: 39, path: ./13.part, file_no: 0
+last minimized: ./13.part
+len: 187, n: 38, path: ./14.part, file_no: 0
+last minimized: ./14.part
+len: 183, n: 37, path: ./15.part, file_no: 0
+len: 183, n: 74, path: ./15.part, file_no: 0
+last minimized: ./15.part
+len: 180, n: 73, path: ./17.part, file_no: 0
+last minimized: ./17.part
+len: 177, n: 72, path: ./18.part, file_no: 0
+last minimized: ./18.part
+len: 174, n: 71, path: ./19.part, file_no: 0
+last minimized: ./19.part
+len: 172, n: 70, path: ./20.part, file_no: 0
+last minimized: ./20.part
+len: 170, n: 69, path: ./21.part, file_no: 0
+len: 170, n: 138, path: ./21.part, file_no: 0
+last minimized: ./21.part
+len: 168, n: 137, path: ./23.part, file_no: 0
+last minimized: ./23.part
+len: 166, n: 136, path: ./24.part, file_no: 0
+last minimized: ./24.part
+len: 165, n: 135, path: ./25.part, file_no: 0
+len: 165, n: 165, path: ./25.part, file_no: 0
+last minimized: ./25.part
+len: 164, n: 164, path: ./27.part, file_no: 0
+last minimized: ./27.part
+len: 163, n: 163, path: ./28.part, file_no: 0
+len: 163, n: 163
+result: ./28.part

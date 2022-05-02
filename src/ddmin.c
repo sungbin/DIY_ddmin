@@ -88,18 +88,19 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 			}
 			
 			long bt;
-			if ((bt = byte_count_file(out_file)) != part_size) {
+			if ((bt = byte_count_file(out_file)) > part_size) {
 				if (truncate(out_file, part_size) == -1) {
 					perror("ERROR: subset truncate");
 					exit(1);
 				}
 			}
+			else if (bt < part_size) {
+				fprintf(stderr, "few elements written: bt=%ld, part_size=%d", bt, part_size);
+			}
 
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
 			if (e_code == 1) {
-				strcpy(minimized_fname, out_file);
 				fprintf(stderr, "last minimized: %s\n", minimized_fname);
-
 				n = 2;
 				any_failed = 1;
 				break;
@@ -181,10 +182,8 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
 			if (e_code == 1) {
-				strcpy(minimized_fname, out_file);
 				fprintf(stderr, "last minimized: %s\n", minimized_fname);
-
-				n = 2;
+				n = MAX(n-1, 2);
 				any_failed = 1;
 				break;
 			}

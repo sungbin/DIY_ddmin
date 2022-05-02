@@ -14,12 +14,12 @@ if [ "$1" == "243" ] ; then
 elif [ "$1" == "350" ] ; then
 	rm *.part
 	rm ./ddmin_350
-	gcc ../../src/main.c ../../src/ddmin.c ../../src/range.c ./source/runner_libxml2_243.c -g -o ./ddmin_350 -lm
+	gcc ../../src/main.c ../../src/ddmin.c ../../src/range.c ./source/runner_libxml2_350.c -g -o ./ddmin_350 -lm
 
-	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml ddmin "AddressSanitizer: heap-buffer-overflow" 2>&1 | tee ret_ddmin_350
+	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml ddmin "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_ddmin_350
 
 	rm *.part
-	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml range "AddressSanitizer: heap-buffer-overflow" 2>&1 | tee ret_range_350
+	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml range "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_range_350
 	rm *.part
 
 
