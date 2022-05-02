@@ -1,0 +1,8 @@
+len: 64, n: 2, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 0
+len: 64, n: 4, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 4
+len: 64, n: 8, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 12
+len: 64, n: 16, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 28
+len: 64, n: 32, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 60
+len: 64, n: 64, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 124
+len: 64, n: 64
+result: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1

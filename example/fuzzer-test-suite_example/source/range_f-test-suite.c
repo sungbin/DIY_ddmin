@@ -27,21 +27,25 @@ range (char * program_path, char * char_seq_path, char * err_msg) {
 	seq_len = byte_count_file(char_seq_path);
 
 	fprintf(stderr, "last minimized: %s, %ld\n", char_seq_path, seq_len);
-	
+
+	char * out_file = calloc(sizeof(char), 512);
+	sprintf(out_file, "./%d.part", file_no++);
+	FILE * in_fp = fopen(char_seq_path, "rb");
+	FILE * out_fp = fopen(out_file, "wb");
+
+	int in_fd = fileno(in_fp);
+	int out_fd = fileno(out_fp);
+
 	for (int rs = seq_len-1; rs >=1; rs--) {
 		fprintf(stderr,"rs:%d\n", rs);
 		for (int begin = 0; begin <= seq_len - rs; begin++) {
+
+			lseek(in_fd, 0, SEEK_SET);
+			lseek(out_fd, 0, SEEK_SET);
+
 			int end = begin + rs;
-
-			char * f_name = calloc(sizeof(char), 512);
-			sprintf(f_name, "./%d.part", file_no++);
-			FILE * out_fp = fopen(f_name, "wb");
-			FILE * in_fp = fopen(char_seq_path, "rb");
-
-			
 			int buf_size = 0;
 			int _begin = begin;
-			//fprintf(stderr,"_begin: %d\n", _begin);
 			while (_begin > 0) {
 				char buf[512];
 				if (_begin < 511) {
@@ -60,11 +64,9 @@ range (char * program_path, char * char_seq_path, char * err_msg) {
 				char buf[512];
 				buf_size = fread(buf, 1, _rs, in_fp);
 				_rs = _rs - buf_size;
-				//fprintf(stderr,"buf_size: %d\n", buf_size);
 			}
 
 			int _last = seq_len - end;
-			//fprintf(stderr,"_last: %d\n", _last);
 			while(_last > 0) {
 				buf_size = 0;
 				char buf[512];
@@ -79,18 +81,29 @@ range (char * program_path, char * char_seq_path, char * err_msg) {
 
 			}
 
-			fclose(in_fp);
-			fclose(out_fp);
-
-			int e_code = test_buffer_overflow(program_path, f_name, err_msg);
-			//fprintf(stderr,"test %s, %s, %s, %d\n", program_path, f_name, err_msg, e_code);
-                        if (e_code == 1) {
-				return range(program_path, f_name, err_msg);
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
 			}
 
-			free(f_name);
+			int bt;
+			if ((bt = byte_count_file(out_file)) != (seq_len - rs)) {
+				if (truncate(out_file, seq_len - rs) == -1) {
+					perror("ERROR: subset truncate");
+					exit(1);
+				}
+			}
+
+			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
+                        if (e_code == 1) {
+				fclose(out_fp);
+				fclose(in_fp);
+				return range(program_path, out_file, err_msg);
+			}
 		}
 	}
+	fclose(out_fp);
+	fclose(in_fp);
 
 	return char_seq_path;
 }

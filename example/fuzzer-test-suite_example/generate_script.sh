@@ -22,8 +22,6 @@ LIST_SQLITE_INPUT_ERR=("LeakSanitizer: detected memory leaks" "AddressSanitizer:
 
 #set +x
 
-echo "ulimit -n 80000000"
-
 for (( i = 0 ; i < ${#LIST_LIBXML2_INPUT[@]} ; i++ )) ; do
 	LIBXML2_INPUT="${LIBXML2_INPUT_PREFIX}${LIST_LIBXML2_INPUT[$i]}"
 	ERR_MSG=${LIST_LIBXML2_INPUT_ERR[$i]}
@@ -57,7 +55,7 @@ for (( i = 0 ; i < ${#LIST_SQLITE_INPUT[@]} ; i++ )) ; do
 	echo ""
 
 	echo "rm -r result_range_${LIST_SQLITE_INPUT[$i]}"
-	echo "mkdir result_ragne_${LIST_SQLITE_INPUT[$i]}"
+	echo "mkdir result_range_${LIST_SQLITE_INPUT[$i]}"
 	echo "cd result_range_${LIST_SQLITE_INPUT[$i]}"
 	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} range \"${ERR_MSG}\"  2>&1 | tee log"
 	echo "cd .."

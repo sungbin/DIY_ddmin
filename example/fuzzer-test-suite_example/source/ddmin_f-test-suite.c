@@ -15,7 +15,7 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-int file_no = 0;
+int file_no = 1;
 int iter_no = 0;
 char * minimized_fname = 0x0;
 
@@ -49,33 +49,22 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 		}
 
 		int any_failed = 0;
-		char out_file[256];
-		sprintf(out_file, "./%d.part", ++iter_no);
-
-		
-		FILE * out_fp = fopen(out_file, "wb");
-		if (out_fp == 0x0) {
-			perror("out_fp");
-			fprintf(stderr, "out_fp: out_file:%s\n", out_file);
-			exit(1);
-		}
 		int in_fd = fileno(in_fp);
-		int out_fd = fileno(out_fp);
 
 		int _f_size = f_size;
 		int _n = n;
+
+		char out_file[256];
+		sprintf(out_file, "./%d.part", file_no++);
+		FILE * out_fp = fopen(out_file, "wb");
+		int out_fd = fileno(out_fp);
 		do {
 
-			file_no++;
+			lseek(out_fd, 0, SEEK_SET);
 
 			int part_size = ceilf((float)_f_size / (float)_n);
+			//fprintf(stderr, "subset part_size: %d \n", part_size);
 			
-			if (ftruncate(out_fd, 0) == -1) {
-				perror("ftruncate error in reduce_to_complement");
-				exit(1);
-			}
-
-			lseek(out_fd, 0, SEEK_SET);
 			int _part_size = part_size;
 			while (_part_size > 0) {
 				
@@ -90,7 +79,6 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 				_part_size -= buf_size;
 
 				buf_size = fwrite(buf, 1, buf_size, out_fp);
-				fprintf(stderr, "part %d:%d %s\n", file_no, buf_size, buf);
 			}
 			_f_size -= part_size;
 
@@ -101,9 +89,10 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 			
 			long bt;
 			if ((bt = byte_count_file(out_file)) != part_size) {
-				fprintf(stderr, "ERROR: reduce_to_subset\n");
-				fprintf(stderr, "outfile: %ld,  p_size: %d\n", bt, part_size);
-				exit(1);
+				if (truncate(out_file, part_size) == -1) {
+					perror("ERROR: subset truncate");
+					exit(1);
+				}
 			}
 
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
@@ -131,19 +120,13 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 		any_failed = 0;
 		_n = n;
 		do {
-			
-			file_no++;
 
 			int part_size = ceilf((float)(f_size - c_start) / (float)_n);
 			int c_end = c_start + part_size;
 
-			if (ftruncate(out_fd, 0) == -1) {
-				perror("ftruncate error in reduce_to_complement");
-				exit(1);
-			}
-
 			lseek(in_fd, 0, SEEK_SET);
 			lseek(out_fd, 0, SEEK_SET);
+
 			while (c_start > 0) {
 
 				char buf[2048];
@@ -155,12 +138,19 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 					buf_size = fread(buf, 1, 2048, in_fp);
 				}
 				c_start -= buf_size;
-				fprintf(stderr, "cpart %d:%d %s\n", file_no, buf_size, buf);
 				fwrite(buf, 1, buf_size, out_fp);
 
 			}
 
-			lseek(in_fd, part_size, SEEK_CUR);
+			{
+				char buf[2048];
+                                int buf_size;
+				buf_size = fread(buf, 1, part_size, in_fp);
+				if (buf_size != part_size) {
+					fprintf(stderr, "ERROR: complement (space)\n");
+					exit(1);
+				}
+			}
 
 			long _f_size = f_size - c_end;
 
@@ -175,7 +165,6 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 					buf_size = fread(buf, 1, 2048, in_fp);
 				}
 				_f_size -= buf_size;
-				fprintf(stderr, "cpart %d:%d %s\n", file_no, buf_size, buf);
 				fwrite(buf, 1, buf_size, out_fp);
 			}
 			if (fflush(out_fp) == -1) {
@@ -184,9 +173,10 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 			}
 
 			if (byte_count_file(out_file) != (f_size - part_size)) {
-				fprintf(stderr, "ERROR: reduce_to_complement\n");
-				fprintf(stderr, "outfile: %ld,  p_size: %ld\n", byte_count_file(out_file), (f_size - part_size));
-				exit(1);
+				if (truncate(out_file, (f_size - part_size)) == -1) {
+					perror("ERROR: subset truncate");
+					exit(1);
+				}
 			}
 
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);

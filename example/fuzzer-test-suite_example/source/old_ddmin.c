@@ -154,7 +154,6 @@ complement_seq_files (int n, char ** seq_file_arr, int arr_len) {
 				break;
 			}
                 	fwrite(buf, 1, buf_size, out_fp);
-			fprintf(stderr, "cpart %d:%d %s\n", file_no,buf_size, buf);
 	        } while (buf_size > 0);
 	}
 
@@ -283,7 +282,6 @@ split_to_file (char ** partition_path_arr, char * char_seq_path, int n) {
 				buf_size = fread(buf, 1, 2048, ifp);
 			}
 
-			fprintf(stderr, "part %d:%d %s\n", file_no,buf_size, buf);	
 			fwrite(buf, 1, buf_size, out_fp);
 			part_size -= buf_size;
 		}
