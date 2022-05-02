@@ -1,0 +1,35 @@
+rm -r result_range_crash-50b12d37d6968a2cd9eb3665d158d9a2fb1f6e28
+mkdir result_range_crash-50b12d37d6968a2cd9eb3665d158d9a2fb1f6e28
+cd result_range_crash-50b12d37d6968a2cd9eb3665d158d9a2fb1f6e28
+../reduce ../libxml2/libxml2-v2.9.2-fsanitize_fuzzer ../fuzzer-test-suite/libxml2-v2.9.2/crash-50b12d37d6968a2cd9eb3665d158d9a2fb1f6e28 range "AddressSanitizer: heap-buffer-overflow"  2>&1 | tee log
+cd ..
+echo "done: ../fuzzer-test-suite/libxml2-v2.9.2/crash-50b12d37d6968a2cd9eb3665d158d9a2fb1f6e28"
+
+rm -r result_range_crash-d8960e21ca40ea5dc60ad655000842376d4178a1
+mkdir result_range_crash-d8960e21ca40ea5dc60ad655000842376d4178a1
+cd result_range_crash-d8960e21ca40ea5dc60ad655000842376d4178a1
+../reduce ../libxml2/libxml2-v2.9.2-fsanitize_fuzzer ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1 range "AddressSanitizer: heap-buffer-overflow"  2>&1 | tee log
+cd ..
+echo "done: ../fuzzer-test-suite/libxml2-v2.9.2/crash-d8960e21ca40ea5dc60ad655000842376d4178a1"
+
+rm -r result_range_leak-bdbb2857b7a086f003db1c418e1d124181341fb1
+mkdir result_range_leak-bdbb2857b7a086f003db1c418e1d124181341fb1
+cd result_range_leak-bdbb2857b7a086f003db1c418e1d124181341fb1
+../reduce ../libxml2/libxml2-v2.9.2-fsanitize_fuzzer ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1 range "LeakSanitizer: detected memory leaks"  2>&1 | tee log
+cd ..
+echo "done: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1"
+
+rm -r result_range_crash-0adc497ccfcc1a4d5e031b735c599df0cae3f4eb
+mkdir result_range_crash-0adc497ccfcc1a4d5e031b735c599df0cae3f4eb
+cd result_range_crash-0adc497ccfcc1a4d5e031b735c599df0cae3f4eb
+../reduce ../sqlite/sqlite-2016-11-14-fsanitize_fuzzer ../fuzzer-test-suite/sqlite-2016-11-14/crash-0adc497ccfcc1a4d5e031b735c599df0cae3f4eb range "AddressSanitizer: heap-use-after-free"  2>&1 | tee log
+cd ..
+echo "done: ../fuzzer-test-suite/sqlite-2016-11-14/crash-0adc497ccfcc1a4d5e031b735c599df0cae3f4eb"
+
+rm -r result_range_crash-1066e42866aad3a04e6851dc494ad54bc31b9f78
+mkdir result_range_crash-1066e42866aad3a04e6851dc494ad54bc31b9f78
+cd result_range_crash-1066e42866aad3a04e6851dc494ad54bc31b9f78
+../reduce ../sqlite/sqlite-2016-11-14-fsanitize_fuzzer ../fuzzer-test-suite/sqlite-2016-11-14/crash-1066e42866aad3a04e6851dc494ad54bc31b9f78 range "AddressSanitizer: heap-use-after-free"  2>&1 | tee log
+cd ..
+echo "done: ../fuzzer-test-suite/sqlite-2016-11-14/crash-1066e42866aad3a04e6851dc494ad54bc31b9f78"
+
