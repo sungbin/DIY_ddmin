@@ -1,4 +1,5 @@
 char *
-range (char * program_path, char * char_seq_path, char * err_msg);
+range (char * program_path, char * char_seq_path, int rs, char * err_msg);
+
 char *
-range_n (char * program_path, char * char_seq_path, char * err_msg, int start_n);
+range_increasing (char * program_path, char * input_path, int rs, char * err_msg);
