@@ -22,3 +22,10 @@ cd result_range
 rm ./*.part
 ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../../../bin/main ../jsondump ../crash.json range "dump example/jsondump.c:44" | tee ret_range
 cd ..
+
+rm -r result_range_inc
+mkdir result_range_inc
+cd result_range_inc
+rm ./*.part
+ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../../../bin/main ../jsondump ../crash.json range_increasing "dump example/jsondump.c:44" | tee ret_range_inc
+cd ..

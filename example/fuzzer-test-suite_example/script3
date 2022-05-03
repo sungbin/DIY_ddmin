@@ -1,6 +1,0 @@
-rm -r result_ddmin_leak-b0276985af5aa23c98d9abf33856ce069ef600e2
-mkdir result_ddmin_leak-b0276985af5aa23c98d9abf33856ce069ef600e2
-cd result_ddmin_leak-b0276985af5aa23c98d9abf33856ce069ef600e2
-../reduce ../sqlite/sqlite-2016-11-14-fsanitize_fuzzer ../fuzzer-test-suite/sqlite-2016-11-14/leak-b0276985af5aa23c98d9abf33856ce069ef600e2 ddmin "LeakSanitizer: detected memory leaks"  2>&1 | tee log
-cd ..
-echo "done: ../fuzzer-test-suite/sqlite-2016-11-14/leak-b0276985af5aa23c98d9abf33856ce069ef600e2"

@@ -1,6 +1,0 @@
-rm -r result_range_uaf-1153fbf466b9474e6e3c48c72e86a4726b449ef7
-mkdir result_range_uaf-1153fbf466b9474e6e3c48c72e86a4726b449ef7
-cd result_range_uaf-1153fbf466b9474e6e3c48c72e86a4726b449ef7
-../reduce ../libxml2/libxml2-v2.9.2-fsanitize_fuzzer ../fuzzer-test-suite/libxml2-v2.9.2/uaf-1153fbf466b9474e6e3c48c72e86a4726b449ef7 range "AddressSanitizer: heap-use-after-free"  2>&1 | tee log
-cd ..
-echo "done: ../fuzzer-test-suite/libxml2-v2.9.2/uaf-1153fbf466b9474e6e3c48c72e86a4726b449ef7"

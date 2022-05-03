@@ -11,6 +11,9 @@ if [ "$1" == "243" ] ; then
 	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_243 "$1_libxml2/xmllint" ./poc range "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_range_243
 	rm *.part
 
+	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_243 "$1_libxml2/xmllint" ./poc range_increasing "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_range_inc_243
+	rm *.part
+
 elif [ "$1" == "350" ] ; then
 	rm *.part
 	rm ./ddmin_350
@@ -22,6 +25,8 @@ elif [ "$1" == "350" ] ; then
 	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml range "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_range_350
 	rm *.part
 
+	ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ./ddmin_350 "$1_libxml2/xmllint" ./test2.xml range_increasing "AddressSanitizer: SEGV on unknown address" 2>&1 | tee ret_range_inc_350
+	rm *.part
 
 else
 	echo "put issue id"

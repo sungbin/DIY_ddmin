@@ -35,7 +35,7 @@ main (int argc, char * argv[]) {
 		printf("applied range-decending result: %s\n", result);
 	}
 	else if (argv[3][0]=='r') {
-		result = range(argv[1], argv[2], (int)(byte_count_file(argv[2])-1),argv[4]);
+		result = range(argv[1], strdup(argv[2]), (int)(byte_count_file(argv[2])-1),argv[4]);
 		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
 		printf("applied range result: %s\n", result);
 	}
