@@ -29,6 +29,11 @@ main (int argc, char * argv[]) {
 	*/
 	
 	// test 5
+	char f_name[256] = "../fuzzer-test-suite/sqlite-2016-11-14/leak-b0276985af5aa23c98d9abf33856ce069ef600e2";
+	char program_path[512] = "../sqlite/sqlite-2016-11-14-fsanitize_fuzzer";
+	char err_msg[256] = "LeakSanitizer: detected memory leaks";
+	/*
+	*/
 
 	//test 7
 	/*
@@ -37,11 +42,12 @@ main (int argc, char * argv[]) {
 	char err_msg[256] = "AddressSanitizer: heap-use-after-free";
 	*/
 
-	#include "../../../include/ddmin.h"
-	char * result = ddmin(program_path, f_name, err_msg);
+	//#include "../../../include/ddmin.h"
+	//char * result = ddmin(program_path, f_name, err_msg);
 
-	//#include "../source/include/range.h"
-	//char * result = range(program_path, f_name, err_msg);
+
+	#include "../../../include/range.h"
+	char * result = range(program_path, f_name, 50, err_msg);
 
 	printf("result: %s\n", result);
 
