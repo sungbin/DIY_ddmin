@@ -22,6 +22,7 @@ extern int file_no;
 extern int iter_no;
 
 
+<<<<<<< HEAD
 void init_cursor(int in_fd, int out_fd) {
 	
 	if (lseek(in_fd, 0, SEEK_SET) == -1) {
