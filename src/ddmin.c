@@ -15,7 +15,7 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-int file_no = 1;
+int file_no = 0;
 int iter_no = 0;
 char * minimized_fname = 0x0;
 

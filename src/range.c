@@ -83,6 +83,10 @@ range_increasing (char * program_path, char * input_path, int rs, char * err_msg
 			fclose(null_fp);
 
 			read_and_write(in_fp, out_fp, input_size - (begin + rs)); //postfix
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
 
 			int bt;
 			if ((bt = byte_count_file(out_file)) > (input_size - rs)) {
@@ -96,11 +100,7 @@ range_increasing (char * program_path, char * input_path, int rs, char * err_msg
 				exit(1);
 			}
 
-			if (fflush(out_fp) == -1) {
-				perror("ERROR: flush");
-				exit(1);
-			}
-
+			
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
 			if (file_no % 1000 == 0) {
 				time_t t = time(NULL);
@@ -151,6 +151,10 @@ range (char * program_path, char * input_path, int rs, char * err_msg) {
 
 			read_and_write(in_fp, out_fp, input_size - (begin + rs)); //postfix
 
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
 			int bt;
 			if ((bt = byte_count_file(out_file)) > (input_size - rs)) {
 				if (truncate(out_file, input_size - rs) == -1) {
@@ -163,10 +167,7 @@ range (char * program_path, char * input_path, int rs, char * err_msg) {
 				exit(1);
 			}
 
-			if (fflush(out_fp) == -1) {
-				perror("ERROR: flush");
-				exit(1);
-			}
+			
 
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
 			if (file_no % 1000 == 0) {
