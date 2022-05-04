@@ -8,6 +8,7 @@
 #include <string.h>
 #include <math.h>
 #include <float.h>
+#include <time.h>
 
 #include "../include/range.h"
 #include "../include/ddmin.h"
@@ -53,10 +54,6 @@ void read_and_write(FILE * in_fp, FILE * out_fp, int n) {
 		n -= b_size;
 	}
 
-	if (fflush(out_fp) == -1) {
-		perror("ERROR: flush");
-		exit(1);
-	}
 }
 
 char *
@@ -99,8 +96,19 @@ range_increasing (char * program_path, char * input_path, int rs, char * err_msg
 				exit(1);
 			}
 
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
+
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
-			fprintf(stderr, "test cnt: %d\n", file_no++);
+			if (file_no % 1000 == 0) {
+				time_t t = time(NULL);
+				struct tm tm = *localtime(&t);
+				fprintf(stderr, "Test count:%d -  %d-%d-%d %d:%d:%d\n", file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+			}
+			file_no++;
                         if (e_code == 1) {
 				fclose(out_fp);
 				fclose(in_fp);
@@ -155,8 +163,19 @@ range (char * program_path, char * input_path, int rs, char * err_msg) {
 				exit(1);
 			}
 
+			if (fflush(out_fp) == -1) {
+				perror("ERROR: flush");
+				exit(1);
+			}
+
 			int e_code = test_buffer_overflow(program_path, out_file, err_msg);
-			fprintf(stderr, "test cnt: %d\n", file_no++);
+			if (file_no % 1000 == 0) {
+				time_t t = time(NULL);
+				struct tm tm = *localtime(&t);
+				fprintf(stderr, "Test count:%d -  %d-%d-%d %d:%d:%d\n", file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+			}
+			file_no++;
                         if (e_code == 1) {
 				fclose(out_fp);
 				fclose(in_fp);
