@@ -75,7 +75,7 @@ range_increasing (char * program_path, char * input_path, int rs, char * err_msg
 
 	while (rs < input_size) {
 		fprintf(stderr,"rs:%d\n", rs);
-		for (int begin = 0; begin < (input_size - rs); begin++) {
+		for (int begin = 0; begin <= (input_size - rs); begin++) {
 
 			init_cursor(in_fd, out_fd);
 
