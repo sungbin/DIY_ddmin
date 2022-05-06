@@ -10,4 +10,5 @@ make
 cd example/
 
 rm ./*.part
-ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../bin/main ./jsondump ./crash.json ddmin | tee ret
+#ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../bin/main ./jsondump ./crash.json ddmin | tee ret
+ASAN_OPTIONS=detect_leaks=0:halt_on_error=1 ../bin/main ./jsondump ../1_4.part ddmin | tee ret
