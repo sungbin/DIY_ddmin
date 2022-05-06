@@ -1,0 +1,736 @@
+last minimized: ../fuzzer-test-suite/sqlite-2016-11-14/leak-b0276985af5aa23c98d9abf33856ce069ef600e2, 2716
+rs:50
+last minimized:./1.part, 2666
+last minimized: ./1.part, 2666
+rs:50
+last minimized:./2.part, 2616
+last minimized: ./2.part, 2616
+rs:50
+last minimized:./3.part, 2566
+last minimized: ./3.part, 2566
+rs:50
+last minimized:./4.part, 2516
+last minimized: ./4.part, 2516
+rs:50
+last minimized:./5.part, 2466
+last minimized: ./5.part, 2466
+rs:50
+last minimized:./6.part, 2416
+last minimized: ./6.part, 2416
+rs:50
+last minimized:./7.part, 2366
+last minimized: ./7.part, 2366
+rs:50
+last minimized:./8.part, 2316
+last minimized: ./8.part, 2316
+rs:50
+last minimized:./9.part, 2266
+last minimized: ./9.part, 2266
+rs:50
+last minimized:./10.part, 2216
+last minimized: ./10.part, 2216
+rs:50
+last minimized:./11.part, 2166
+last minimized: ./11.part, 2166
+rs:50
+last minimized:./12.part, 2116
+last minimized: ./12.part, 2116
+rs:50
+last minimized:./13.part, 2066
+last minimized: ./13.part, 2066
+rs:50
+last minimized:./14.part, 2016
+last minimized: ./14.part, 2016
+rs:50
+last minimized:./15.part, 1966
+last minimized: ./15.part, 1966
+rs:50
+last minimized:./16.part, 1916
+last minimized: ./16.part, 1916
+rs:50
+last minimized:./17.part, 1866
+last minimized: ./17.part, 1866
+rs:50
+last minimized:./18.part, 1816
+last minimized: ./18.part, 1816
+rs:50
+last minimized:./19.part, 1766
+last minimized: ./19.part, 1766
+rs:50
+last minimized:./20.part, 1716
+last minimized: ./20.part, 1716
+rs:50
+last minimized:./21.part, 1666
+last minimized: ./21.part, 1666
+rs:50
+last minimized:./22.part, 1616
+last minimized: ./22.part, 1616
+rs:50
+last minimized:./23.part, 1566
+last minimized: ./23.part, 1566
+rs:50
+last minimized:./24.part, 1516
+last minimized: ./24.part, 1516
+rs:50
+last minimized:./25.part, 1466
+last minimized: ./25.part, 1466
+rs:50
+last minimized:./26.part, 1416
+last minimized: ./26.part, 1416
+rs:50
+rs:49
+rs:48
+rs:47
+rs:46
+rs:45
+rs:44
+rs:43
+rs:42
+rs:41
+rs:40
+rs:39
+rs:38
+rs:37
+rs:36
+last minimized:./27.part, 1380
+last minimized: ./27.part, 1380
+rs:36
+rs:35
+rs:34
+rs:33
+rs:32
+rs:31
+rs:30
+rs:29
+rs:28
+rs:27
+rs:26
+rs:25
+rs:24
+rs:23
+rs:22
+rs:21
+rs:20
+last minimized:./28.part, 1360
+last minimized: ./28.part, 1360
+rs:20
+rs:19
+rs:18
+rs:17
+last minimized:./29.part, 1343
+last minimized: ./29.part, 1343
+rs:17
+rs:16
+rs:15
+rs:14
+last minimized:./30.part, 1329
+last minimized: ./30.part, 1329
+rs:14
+rs:13
+rs:12
+rs:11
+rs:10
+last minimized:./31.part, 1319
+last minimized: ./31.part, 1319
+rs:10
+rs:9
+last minimized:./32.part, 1310
+last minimized: ./32.part, 1310
+rs:9
+last minimized:./33.part, 1301
+last minimized: ./33.part, 1301
+rs:9
+last minimized:./34.part, 1292
+last minimized: ./34.part, 1292
+rs:9
+last minimized:./35.part, 1283
+last minimized: ./35.part, 1283
+rs:9
+last minimized:./36.part, 1274
+last minimized: ./36.part, 1274
+rs:9
+last minimized:./37.part, 1265
+last minimized: ./37.part, 1265
+rs:9
+last minimized:./38.part, 1256
+last minimized: ./38.part, 1256
+rs:9
+last minimized:./39.part, 1247
+last minimized: ./39.part, 1247
+rs:9
+last minimized:./40.part, 1238
+last minimized: ./40.part, 1238
+rs:9
+last minimized:./41.part, 1229
+last minimized: ./41.part, 1229
+rs:9
+last minimized:./42.part, 1220
+last minimized: ./42.part, 1220
+rs:9
+last minimized:./43.part, 1211
+last minimized: ./43.part, 1211
+rs:9
+last minimized:./44.part, 1202
+last minimized: ./44.part, 1202
+rs:9
+last minimized:./45.part, 1193
+last minimized: ./45.part, 1193
+rs:9
+last minimized:./46.part, 1184
+last minimized: ./46.part, 1184
+rs:9
+last minimized:./47.part, 1175
+last minimized: ./47.part, 1175
+rs:9
+last minimized:./48.part, 1166
+last minimized: ./48.part, 1166
+rs:9
+last minimized:./49.part, 1157
+last minimized: ./49.part, 1157
+rs:9
+last minimized:./50.part, 1148
+last minimized: ./50.part, 1148
+rs:9
+last minimized:./51.part, 1139
+last minimized: ./51.part, 1139
+rs:9
+last minimized:./52.part, 1130
+last minimized: ./52.part, 1130
+rs:9
+last minimized:./53.part, 1121
+last minimized: ./53.part, 1121
+rs:9
+last minimized:./54.part, 1112
+last minimized: ./54.part, 1112
+rs:9
+last minimized:./55.part, 1103
+last minimized: ./55.part, 1103
+rs:9
+last minimized:./56.part, 1094
+last minimized: ./56.part, 1094
+rs:9
+last minimized:./57.part, 1085
+last minimized: ./57.part, 1085
+rs:9
+last minimized:./58.part, 1076
+last minimized: ./58.part, 1076
+rs:9
+last minimized:./59.part, 1067
+last minimized: ./59.part, 1067
+rs:9
+last minimized:./60.part, 1058
+last minimized: ./60.part, 1058
+rs:9
+last minimized:./61.part, 1049
+last minimized: ./61.part, 1049
+rs:9
+last minimized:./62.part, 1040
+last minimized: ./62.part, 1040
+rs:9
+rs:8
+last minimized:./63.part, 1032
+last minimized: ./63.part, 1032
+rs:8
+last minimized:./64.part, 1024
+last minimized: ./64.part, 1024
+rs:8
+last minimized:./65.part, 1016
+last minimized: ./65.part, 1016
+rs:8
+last minimized:./66.part, 1008
+last minimized: ./66.part, 1008
+rs:8
+last minimized:./67.part, 1000
+last minimized: ./67.part, 1000
+rs:8
+last minimized:./68.part, 992
+last minimized: ./68.part, 992
+rs:8
+rs:7
+last minimized:./69.part, 985
+last minimized: ./69.part, 985
+rs:7
+last minimized:./70.part, 978
+last minimized: ./70.part, 978
+rs:7
+last minimized:./71.part, 971
+last minimized: ./71.part, 971
+rs:7
+last minimized:./72.part, 964
+last minimized: ./72.part, 964
+rs:7
+last minimized:./73.part, 957
+last minimized: ./73.part, 957
+rs:7
+last minimized:./74.part, 950
+last minimized: ./74.part, 950
+rs:7
+last minimized:./75.part, 943
+last minimized: ./75.part, 943
+rs:7
+last minimized:./76.part, 936
+last minimized: ./76.part, 936
+rs:7
+last minimized:./77.part, 929
+last minimized: ./77.part, 929
+rs:7
+last minimized:./78.part, 922
+last minimized: ./78.part, 922
+rs:7
+last minimized:./79.part, 915
+last minimized: ./79.part, 915
+rs:7
+last minimized:./80.part, 908
+last minimized: ./80.part, 908
+rs:7
+last minimized:./81.part, 901
+last minimized: ./81.part, 901
+rs:7
+rs:6
+last minimized:./82.part, 895
+last minimized: ./82.part, 895
+rs:6
+last minimized:./83.part, 889
+last minimized: ./83.part, 889
+rs:6
+rs:5
+last minimized:./84.part, 884
+last minimized: ./84.part, 884
+rs:5
+last minimized:./85.part, 879
+last minimized: ./85.part, 879
+rs:5
+rs:4
+last minimized:./86.part, 875
+last minimized: ./86.part, 875
+rs:4
+last minimized:./87.part, 871
+last minimized: ./87.part, 871
+rs:4
+last minimized:./88.part, 867
+last minimized: ./88.part, 867
+rs:4
+rs:3
+last minimized:./89.part, 864
+last minimized: ./89.part, 864
+rs:3
+last minimized:./90.part, 861
+last minimized: ./90.part, 861
+rs:3
+last minimized:./91.part, 858
+last minimized: ./91.part, 858
+rs:3
+last minimized:./92.part, 855
+last minimized: ./92.part, 855
+rs:3
+last minimized:./93.part, 852
+last minimized: ./93.part, 852
+rs:3
+last minimized:./94.part, 849
+last minimized: ./94.part, 849
+rs:3
+last minimized:./95.part, 846
+last minimized: ./95.part, 846
+rs:3
+last minimized:./96.part, 843
+last minimized: ./96.part, 843
+rs:3
+last minimized:./97.part, 840
+last minimized: ./97.part, 840
+rs:3
+last minimized:./98.part, 837
+last minimized: ./98.part, 837
+rs:3
+last minimized:./99.part, 834
+last minimized: ./99.part, 834
+rs:3
+last minimized:./100.part, 831
+last minimized: ./100.part, 831
+rs:3
+last minimized:./101.part, 828
+last minimized: ./101.part, 828
+rs:3
+last minimized:./102.part, 825
+last minimized: ./102.part, 825
+rs:3
+last minimized:./103.part, 822
+last minimized: ./103.part, 822
+rs:3
+last minimized:./104.part, 819
+last minimized: ./104.part, 819
+rs:3
+rs:2
+last minimized:./105.part, 817
+last minimized: ./105.part, 817
+rs:2
+last minimized:./106.part, 815
+last minimized: ./106.part, 815
+rs:2
+last minimized:./107.part, 813
+last minimized: ./107.part, 813
+rs:2
+last minimized:./108.part, 811
+last minimized: ./108.part, 811
+rs:2
+last minimized:./109.part, 809
+last minimized: ./109.part, 809
+rs:2
+last minimized:./110.part, 807
+last minimized: ./110.part, 807
+rs:2
+last minimized:./111.part, 805
+last minimized: ./111.part, 805
+rs:2
+last minimized:./112.part, 803
+last minimized: ./112.part, 803
+rs:2
+last minimized:./113.part, 801
+last minimized: ./113.part, 801
+rs:2
+last minimized:./114.part, 799
+last minimized: ./114.part, 799
+rs:2
+last minimized:./115.part, 797
+last minimized: ./115.part, 797
+rs:2
+last minimized:./116.part, 795
+last minimized: ./116.part, 795
+rs:2
+last minimized:./117.part, 793
+last minimized: ./117.part, 793
+rs:2
+last minimized:./118.part, 791
+last minimized: ./118.part, 791
+rs:2
+last minimized:./119.part, 789
+last minimized: ./119.part, 789
+rs:2
+last minimized:./120.part, 787
+last minimized: ./120.part, 787
+rs:2
+last minimized:./121.part, 785
+last minimized: ./121.part, 785
+rs:2
+last minimized:./122.part, 783
+last minimized: ./122.part, 783
+rs:2
+last minimized:./123.part, 781
+last minimized: ./123.part, 781
+rs:2
+last minimized:./124.part, 779
+last minimized: ./124.part, 779
+rs:2
+last minimized:./125.part, 777
+last minimized: ./125.part, 777
+rs:2
+last minimized:./126.part, 775
+last minimized: ./126.part, 775
+rs:2
+last minimized:./127.part, 773
+last minimized: ./127.part, 773
+rs:2
+last minimized:./128.part, 771
+last minimized: ./128.part, 771
+rs:2
+last minimized:./129.part, 769
+last minimized: ./129.part, 769
+rs:2
+last minimized:./130.part, 767
+last minimized: ./130.part, 767
+rs:2
+last minimized:./131.part, 765
+last minimized: ./131.part, 765
+rs:2
+last minimized:./132.part, 763
+last minimized: ./132.part, 763
+rs:2
+last minimized:./133.part, 761
+last minimized: ./133.part, 761
+rs:2
+last minimized:./134.part, 759
+last minimized: ./134.part, 759
+rs:2
+last minimized:./135.part, 757
+last minimized: ./135.part, 757
+rs:2
+last minimized:./136.part, 755
+last minimized: ./136.part, 755
+rs:2
+last minimized:./137.part, 753
+last minimized: ./137.part, 753
+rs:2
+last minimized:./138.part, 751
+last minimized: ./138.part, 751
+rs:2
+last minimized:./139.part, 749
+last minimized: ./139.part, 749
+rs:2
+last minimized:./140.part, 747
+last minimized: ./140.part, 747
+rs:2
+last minimized:./141.part, 745
+last minimized: ./141.part, 745
+rs:2
+last minimized:./142.part, 743
+last minimized: ./142.part, 743
+rs:2
+last minimized:./143.part, 741
+last minimized: ./143.part, 741
+rs:2
+last minimized:./144.part, 739
+last minimized: ./144.part, 739
+rs:2
+last minimized:./145.part, 737
+last minimized: ./145.part, 737
+rs:2
+last minimized:./146.part, 735
+last minimized: ./146.part, 735
+rs:2
+last minimized:./147.part, 733
+last minimized: ./147.part, 733
+rs:2
+rs:1
+last minimized:./148.part, 732
+last minimized: ./148.part, 732
+rs:1
+last minimized:./149.part, 731
+last minimized: ./149.part, 731
+rs:1
+last minimized:./150.part, 730
+last minimized: ./150.part, 730
+rs:1
+last minimized:./151.part, 729
+last minimized: ./151.part, 729
+rs:1
+last minimized:./152.part, 728
+last minimized: ./152.part, 728
+rs:1
+last minimized:./153.part, 727
+last minimized: ./153.part, 727
+rs:1
+last minimized:./154.part, 726
+last minimized: ./154.part, 726
+rs:1
+last minimized:./155.part, 725
+last minimized: ./155.part, 725
+rs:1
+last minimized:./156.part, 724
+last minimized: ./156.part, 724
+rs:1
+last minimized:./157.part, 723
+last minimized: ./157.part, 723
+rs:1
+last minimized:./158.part, 722
+last minimized: ./158.part, 722
+rs:1
+last minimized:./159.part, 721
+last minimized: ./159.part, 721
+rs:1
+last minimized:./160.part, 720
+last minimized: ./160.part, 720
+rs:1
+last minimized:./161.part, 719
+last minimized: ./161.part, 719
+rs:1
+last minimized:./162.part, 718
+last minimized: ./162.part, 718
+rs:1
+last minimized:./163.part, 717
+last minimized: ./163.part, 717
+rs:1
+last minimized:./164.part, 716
+last minimized: ./164.part, 716
+rs:1
+last minimized:./165.part, 715
+last minimized: ./165.part, 715
+rs:1
+last minimized:./166.part, 714
+last minimized: ./166.part, 714
+rs:1
+last minimized:./167.part, 713
+last minimized: ./167.part, 713
+rs:1
+last minimized:./168.part, 712
+last minimized: ./168.part, 712
+rs:1
+last minimized:./169.part, 711
+last minimized: ./169.part, 711
+rs:1
+last minimized:./170.part, 710
+last minimized: ./170.part, 710
+rs:1
+last minimized:./171.part, 709
+last minimized: ./171.part, 709
+rs:1
+last minimized:./172.part, 708
+last minimized: ./172.part, 708
+rs:1
+last minimized:./173.part, 707
+last minimized: ./173.part, 707
+rs:1
+last minimized:./174.part, 706
+last minimized: ./174.part, 706
+rs:1
+last minimized:./175.part, 705
+last minimized: ./175.part, 705
+rs:1
+last minimized:./176.part, 704
+last minimized: ./176.part, 704
+rs:1
+last minimized:./177.part, 703
+last minimized: ./177.part, 703
+rs:1
+last minimized:./178.part, 702
+last minimized: ./178.part, 702
+rs:1
+last minimized:./179.part, 701
+last minimized: ./179.part, 701
+rs:1
+last minimized:./180.part, 700
+last minimized: ./180.part, 700
+rs:1
+last minimized:./181.part, 699
+last minimized: ./181.part, 699
+rs:1
+last minimized:./182.part, 698
+last minimized: ./182.part, 698
+rs:1
+last minimized:./183.part, 697
+last minimized: ./183.part, 697
+rs:1
+last minimized:./184.part, 696
+last minimized: ./184.part, 696
+rs:1
+last minimized:./185.part, 695
+last minimized: ./185.part, 695
+rs:1
+last minimized:./186.part, 694
+last minimized: ./186.part, 694
+rs:1
+last minimized:./187.part, 693
+last minimized: ./187.part, 693
+rs:1
+last minimized:./188.part, 692
+last minimized: ./188.part, 692
+rs:1
+last minimized:./189.part, 691
+last minimized: ./189.part, 691
+rs:1
+last minimized:./190.part, 690
+last minimized: ./190.part, 690
+rs:1
+last minimized:./191.part, 689
+last minimized: ./191.part, 689
+rs:1
+last minimized:./192.part, 688
+last minimized: ./192.part, 688
+rs:1
+last minimized:./193.part, 687
+last minimized: ./193.part, 687
+rs:1
+last minimized:./194.part, 686
+last minimized: ./194.part, 686
+rs:1
+last minimized:./195.part, 685
+last minimized: ./195.part, 685
+rs:1
+last minimized:./196.part, 684
+last minimized: ./196.part, 684
+rs:1
+last minimized:./197.part, 683
+last minimized: ./197.part, 683
+rs:1
+last minimized:./198.part, 682
+last minimized: ./198.part, 682
+rs:1
+last minimized:./199.part, 681
+last minimized: ./199.part, 681
+rs:1
+last minimized:./200.part, 680
+last minimized: ./200.part, 680
+rs:1
+last minimized:./201.part, 679
+last minimized: ./201.part, 679
+rs:1
+last minimized:./202.part, 678
+last minimized: ./202.part, 678
+rs:1
+last minimized:./203.part, 677
+last minimized: ./203.part, 677
+rs:1
+last minimized:./204.part, 676
+last minimized: ./204.part, 676
+rs:1
+last minimized:./205.part, 675
+last minimized: ./205.part, 675
+rs:1
+last minimized:./206.part, 674
+last minimized: ./206.part, 674
+rs:1
+last minimized:./207.part, 673
+last minimized: ./207.part, 673
+rs:1
+last minimized:./208.part, 672
+last minimized: ./208.part, 672
+rs:1
+last minimized:./209.part, 671
+last minimized: ./209.part, 671
+rs:1
+last minimized:./210.part, 670
+last minimized: ./210.part, 670
+rs:1
+last minimized:./211.part, 669
+last minimized: ./211.part, 669
+rs:1
+last minimized:./212.part, 668
+last minimized: ./212.part, 668
+rs:1
+last minimized:./213.part, 667
+last minimized: ./213.part, 667
+rs:1
+last minimized:./214.part, 666
+last minimized: ./214.part, 666
+rs:1
+last minimized:./215.part, 665
+last minimized: ./215.part, 665
+rs:1
+last minimized:./216.part, 664
+last minimized: ./216.part, 664
+rs:1
+last minimized:./217.part, 663
+last minimized: ./217.part, 663
+rs:1
+last minimized:./218.part, 662
+last minimized: ./218.part, 662
+rs:1
+last minimized:./219.part, 661
+last minimized: ./219.part, 661
+rs:1
+last minimized:./220.part, 660
+last minimized: ./220.part, 660
+rs:1
+last minimized:./221.part, 659
+last minimized: ./221.part, 659
+rs:1
+last minimized:./222.part, 658
+last minimized: ./222.part, 658
+rs:1
+last minimized:./223.part, 657
+last minimized: ./223.part, 657
+rs:1
+last minimized:./224.part, 656
+last minimized: ./224.part, 656
+rs:1
+last minimized:./225.part, 655
+last minimized: ./225.part, 655
+rs:1
+last minimized:./226.part, 654
+last minimized: ./226.part, 654
+rs:1
+last minimized:./227.part, 653
+last minimized: ./227.part, 653
+rs:1
+last minimized:./228.part, 652
+last minimized: ./228.part, 652
+rs:1
+result: ./228.part

@@ -14,17 +14,17 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 
 all: $(BIN)
 
-$(BIN): $(BINDIR) ddmin mymin main runner
+$(BIN): $(BINDIR) ddmin main runner range
 	$(CC) $(OBJS) -g -o $(BIN) -lm
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
+range : src/range.c
+	$(CC) -c -g -o bin/range.o src/range.c
+
 ddmin : src/ddmin.c
 	$(CC) -c -g -o bin/ddmin.o src/ddmin.c
-
-mymin : src/mymin.c
-	$(CC) -c -g -o bin/mymin.o src/mymin.c
 
 runner : src/runner.c
 	$(CC) -c -g -o bin/runner.o src/runner.c
