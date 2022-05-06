@@ -1,0 +1,60 @@
+len: 64, n: 2, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 0
+len: 64, n: 4, path: ../fuzzer-test-suite/libxml2-v2.9.2/leak-bdbb2857b7a086f003db1c418e1d124181341fb1, file_no: 0
+last minimized: ./2.part
+len: 48, n: 2, path: ./2.part, file_no: 0
+len: 48, n: 4, path: ./2.part, file_no: 0
+len: 48, n: 8, path: ./2.part, file_no: 0
+last minimized: ./5.part
+len: 42, n: 2, path: ./5.part, file_no: 0
+len: 42, n: 4, path: ./5.part, file_no: 0
+len: 42, n: 8, path: ./5.part, file_no: 0
+len: 42, n: 16, path: ./5.part, file_no: 0
+last minimized: ./9.part
+len: 40, n: 2, path: ./9.part, file_no: 0
+len: 40, n: 4, path: ./9.part, file_no: 0
+len: 40, n: 8, path: ./9.part, file_no: 0
+len: 40, n: 16, path: ./9.part, file_no: 0
+last minimized: ./13.part
+len: 38, n: 2, path: ./13.part, file_no: 0
+len: 38, n: 4, path: ./13.part, file_no: 0
+len: 38, n: 8, path: ./13.part, file_no: 0
+len: 38, n: 16, path: ./13.part, file_no: 0
+len: 38, n: 32, path: ./13.part, file_no: 0
+last minimized: ./18.part
+len: 36, n: 2, path: ./18.part, file_no: 0
+len: 36, n: 4, path: ./18.part, file_no: 0
+len: 36, n: 8, path: ./18.part, file_no: 0
+len: 36, n: 16, path: ./18.part, file_no: 0
+len: 36, n: 32, path: ./18.part, file_no: 0
+last minimized: ./23.part
+len: 35, n: 2, path: ./23.part, file_no: 0
+len: 35, n: 4, path: ./23.part, file_no: 0
+len: 35, n: 8, path: ./23.part, file_no: 0
+len: 35, n: 16, path: ./23.part, file_no: 0
+len: 35, n: 32, path: ./23.part, file_no: 0
+last minimized: ./28.part
+len: 34, n: 2, path: ./28.part, file_no: 0
+len: 34, n: 4, path: ./28.part, file_no: 0
+len: 34, n: 8, path: ./28.part, file_no: 0
+len: 34, n: 16, path: ./28.part, file_no: 0
+len: 34, n: 32, path: ./28.part, file_no: 0
+last minimized: ./33.part
+len: 33, n: 2, path: ./33.part, file_no: 0
+len: 33, n: 4, path: ./33.part, file_no: 0
+len: 33, n: 8, path: ./33.part, file_no: 0
+len: 33, n: 16, path: ./33.part, file_no: 0
+len: 33, n: 32, path: ./33.part, file_no: 0
+last minimized: ./38.part
+len: 32, n: 2, path: ./38.part, file_no: 0
+len: 32, n: 4, path: ./38.part, file_no: 0
+len: 32, n: 8, path: ./38.part, file_no: 0
+len: 32, n: 16, path: ./38.part, file_no: 0
+len: 32, n: 32, path: ./38.part, file_no: 0
+last minimized: ./43.part
+len: 31, n: 2, path: ./43.part, file_no: 0
+len: 31, n: 4, path: ./43.part, file_no: 0
+len: 31, n: 8, path: ./43.part, file_no: 0
+len: 31, n: 16, path: ./43.part, file_no: 0
+len: 31, n: 31, path: ./43.part, file_no: 0
+len: 31, n: 31
+result: ./43.part

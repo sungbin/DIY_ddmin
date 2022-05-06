@@ -22,48 +22,67 @@ LIST_SQLITE_INPUT_ERR=("LeakSanitizer: detected memory leaks" "AddressSanitizer:
 
 #set +x
 
-echo "ulimit -n 80000000"
-
 for (( i = 0 ; i < ${#LIST_LIBXML2_INPUT[@]} ; i++ )) ; do
 	LIBXML2_INPUT="${LIBXML2_INPUT_PREFIX}${LIST_LIBXML2_INPUT[$i]}"
 	ERR_MSG=${LIST_LIBXML2_INPUT_ERR[$i]}
-	echo "rm -r result_ddmin_${LIST_LIBXML2_INPUT[$i]}"
-	echo "mkdir result_ddmin_${LIST_LIBXML2_INPUT[$i]}"
-	echo "cd result_ddmin_${LIST_LIBXML2_INPUT[$i]}"
-	echo "${REDUCE_EXE} ${LIBXML2_EXE} ${LIBXML2_INPUT} ddmin \"${ERR_MSG}\"  2>&1 | tee log"
-	echo "cd .."
-	echo "echo \"done: $LIBXML2_INPUT\""
-	echo ""
+	echo "rm -r result_${LIST_LIBXML2_INPUT[$i]}_ddmin" > "script${i}_ddmin"
+	echo "mkdir result_${LIST_LIBXML2_INPUT[$i]}_ddmin" >> "script${i}_ddmin"
+	echo "cd result_${LIST_LIBXML2_INPUT[$i]}_ddmin" >> "script${i}_ddmin"
+	echo "${REDUCE_EXE} ${LIBXML2_EXE} ${LIBXML2_INPUT} ddmin \"${ERR_MSG}\"  2>&1 | tee log" >> "script${i}_ddmin"
+	echo "cd .." >> "script${i}_ddmin"
+	echo "echo \"done ddmin on $LIBXML2_INPUT\"" >> "script${i}_ddmin"
+	echo "" >> "script${i}_ddmin"
+	chmod 755 "script${i}_ddmin"
 
-	echo "rm -r result_range_${LIST_LIBXML2_INPUT[$i]}"
-	echo "mkdir result_range_${LIST_LIBXML2_INPUT[$i]}"
-	echo "cd result_range_${LIST_LIBXML2_INPUT[$i]}"
-	echo "${REDUCE_EXE} ${LIBXML2_EXE} ${LIBXML2_INPUT} range \"${ERR_MSG}\"  2>&1 | tee log"
-	echo "cd .."
-	echo "echo \"done: $LIBXML2_INPUT\""
-	echo ""
+	echo "rm -r result_${LIST_LIBXML2_INPUT[$i]}_range" > "script${i}_range"
+	echo "mkdir result_${LIST_LIBXML2_INPUT[$i]}_range" >> "script${i}_range"
+	echo "cd result_${LIST_LIBXML2_INPUT[$i]}_range" >> "script${i}_range"
+	echo "${REDUCE_EXE} ${LIBXML2_EXE} ${LIBXML2_INPUT} range \"${ERR_MSG}\"  2>&1 | tee log" >> "script${i}_range"
+	echo "cd .." >> "script${i}_range"
+	echo "echo \"done range on $LIBXML2_INPUT\"" >> "script${i}_range"
+	echo "" >> "script${i}_range"
+	chmod 755 "script${i}_range"
+
+	echo "rm -r result_${LIST_LIBXML2_INPUT[$i]}_range_inc" > "script${i}_range_inc"
+	echo "mkdir result_${LIST_LIBXML2_INPUT[$i]}_range_inc" >> "script${i}_range_inc"
+	echo "cd result_${LIST_LIBXML2_INPUT[$i]}_range_inc" >> "script${i}_range_inc"
+	echo "${REDUCE_EXE} ${LIBXML2_EXE} ${LIBXML2_INPUT} range_increasing \"${ERR_MSG}\"  2>&1 | tee log" >> "script${i}_range_inc"
+	echo "cd .." >> "script${i}_range_inc"
+	echo "echo \"done range-inc on $LIBXML2_INPUT\"" >> "script${i}_range_inc"
+	echo "" >> "script${i}_range_inc"
+	chmod 755 "script${i}_range_inc"
 
 done
 
 for (( i = 0 ; i < ${#LIST_SQLITE_INPUT[@]} ; i++ )) ; do
 	SQLITE_INPUT="${SQLITE_INPUT_PREFIX}${LIST_SQLITE_INPUT[$i]}"
 	ERR_MSG=${LIST_SQLITE_INPUT_ERR[$i]}
-	echo "rm -r result_ddmin_${LIST_SQLITE_INPUT[$i]}"
-	echo "mkdir result_ddmin_${LIST_SQLITE_INPUT[$i]}"
-	echo "cd result_ddmin_${LIST_SQLITE_INPUT[$i]}"
-	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} ddmin \"${ERR_MSG}\"  2>&1 | tee log"
-	echo "cd .."
-	echo "echo \"done: $SQLITE_INPUT\""
-	echo ""
+	echo "rm -r result_${LIST_SQLITE_INPUT[$i]}_ddmin" > "script$((i+4))_ddmin"
+	echo "mkdir result_${LIST_SQLITE_INPUT[$i]}_ddmin" >> "script$((i+4))_ddmin"
+	echo "cd result_${LIST_SQLITE_INPUT[$i]}_ddmin" >> "script$((i+4))_ddmin"
+	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} ddmin \"${ERR_MSG}\"  2>&1 | tee log" >> "script$((i+4))_ddmin"
+	echo "cd .." >> "script$((i+4))_ddmin"
+	echo "echo \"done ddmin on $SQLITE_INPUT\"" >> "script$((i+4))_ddmin"
+	echo "" >> "script$((i+4))_ddmin"
+	chmod 755 "script$((i+4))_ddmin"
 
-	echo "rm -r result_range_${LIST_SQLITE_INPUT[$i]}"
-	echo "mkdir result_ragne_${LIST_SQLITE_INPUT[$i]}"
-	echo "cd result_range_${LIST_SQLITE_INPUT[$i]}"
-	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} range \"${ERR_MSG}\"  2>&1 | tee log"
-	echo "cd .."
-	echo "echo \"done: $SQLITE_INPUT\""
-	echo ""
+	echo "rm -r result_${LIST_SQLITE_INPUT[$i]}_range" > "script$((i+4))_range"
+	echo "mkdir result_${LIST_SQLITE_INPUT[$i]}_range" >> "script$((i+4))_range"
+	echo "cd result_${LIST_SQLITE_INPUT[$i]}_range" >> "script$((i+4))_range"
+	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} range \"${ERR_MSG}\"  2>&1 | tee log" >> "script$((i+4))_range"
+	echo "cd .." >> "script$((i+4))_range"
+	echo "echo \"done range on $SQLITE_INPUT\"" >> "script$((i+4))_range"
+	echo "" >> "script$((i+4))_range"
+	chmod 755 "script$((i+4))_range"
 	
+	echo "rm -r result_${LIST_SQLITE_INPUT[$i]}_range_inc" > "script$((i+4))_range_inc"
+	echo "mkdir result_${LIST_SQLITE_INPUT[$i]}_range_inc" >> "script$((i+4))_range_inc"
+	echo "cd result_${LIST_SQLITE_INPUT[$i]}_range_inc" >> "script$((i+4))_range_inc"
+	echo "${REDUCE_EXE} ${SQLITE_EXE} ${SQLITE_INPUT} range_increasing \"${ERR_MSG}\"  2>&1 | tee log" >> "script$((i+4))_range_inc"
+	echo "cd .." >> "script$((i+4))_range_inc"
+	echo "echo \"done range-inc on $SQLITE_INPUT\"" >> "script$((i+4))_range_inc"
+	echo "" >> "script$((i+4))_range_inc"
+	chmod 755 "script$((i+4))_range_inc"
 done
 
 

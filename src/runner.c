@@ -22,15 +22,16 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
 
         /* Child process */
         if (pid == 0) { 
-                int input_fd = open(input_path, O_RDONLY);
+
+		int input_fd = open(input_path, O_RDONLY);
                 int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
                 int out_err_fd = open(output_err_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
                 
-                dup2(input_fd, STDIN_FILENO);
+		dup2(input_fd, STDIN_FILENO);
                 dup2(out_fd, STDOUT_FILENO);
                 dup2(out_err_fd, STDERR_FILENO);
                 
-                execl(target_path, target_path, NULL);
+		execl(target_path, target_path, NULL);
                 _exit(1);
         }
         
