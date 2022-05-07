@@ -21,8 +21,6 @@ int iter_no = 0;
 char * minimized_fname = 0x0;
 
 // return value: minimum input path
-int
-copy (const char *src, const char *dst);
 
 char *
 ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
@@ -265,7 +263,7 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 }
 
 char *
-ddmin_dir (char * program_path, char * input_dir, char * err_msg) {
+ddmin_dir (char * program_path, char * input_dir, char * err_msg, char * exe_dir) {
 
 	if (access(program_path, F_OK)) {
 		fprintf(stderr, "no program path: %s\n", program_path);
@@ -299,7 +297,7 @@ ddmin_dir (char * program_path, char * input_dir, char * err_msg) {
 		int _n = n;
 
 		char out_file[256];
-		sprintf(out_file, "../%d.part", file_no++);
+		sprintf(out_file, "../%s/%d.part", exe_dir, file_no++);
 		FILE * out_fp = fopen(out_file, "wb");
 		int out_fd = fileno(out_fp);
 		do {

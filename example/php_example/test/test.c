@@ -13,20 +13,20 @@ int
 main (int argc, char * argv[]) {
 
 
-	
-	
-	// test 5
-/*
-	./sapi/fuzzer/php-fuzz-tracing-jit ../inputs --runs=1
-*/
-	char f_name[256] = "../inputs";
+	// ddmin test
+	/*
 	char program_path[512] = "./sapi/fuzzer/php-fuzz-tracing-jit";
-	char err_msg[256] = "AddressSanitizer: heap-use-after-free";
-
-	//char * result = range(program_path, f_name, 50, err_msg);
-	//int ret = test_buffer_overflow(program_path, f_name, err_msg);
-
+	char f_name[256] = "../inputs";
+	char err_msg[256] = "zend_unclean_zval_ptr_dtor";
 	ddmin_dir(program_path, f_name, err_msg); 
+	*/
+
+	char program_path[512] = "./sapi/fuzzer/php-fuzz-tracing-jit";
+	char input_dir[256] = "../inputs";
+	char f_name[256] = "test_input";
+	char err_msg[256] = "zend_unclean_zval_ptr_dtor";
+	range_dir(program_path, input_dir, f_name, (int) byte_count_file("../test_input")- 1000, err_msg); 
+
 
 
 	//printf("result: %d\n", ret);
