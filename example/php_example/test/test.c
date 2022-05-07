@@ -26,7 +26,7 @@ main (int argc, char * argv[]) {
 	//char * result = range(program_path, f_name, 50, err_msg);
 	//int ret = test_buffer_overflow(program_path, f_name, err_msg);
 
-	ddmin(program_path, f_name, err_msg); 
+	ddmin_dir(program_path, f_name, err_msg); 
 
 
 	//printf("result: %d\n", ret);

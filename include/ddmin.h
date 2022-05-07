@@ -1,6 +1,9 @@
 char *
 ddmin (char * program_path, char * char_seq_path, char * err_msg);
 
+char *
+ddmin_dir (char * program_path, char * input_dir, char * err_msg);
+
 int
 test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg);
 
