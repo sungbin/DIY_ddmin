@@ -253,8 +253,8 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
         }
 
         fclose(fp);
-        remove("./program.strout");
-        remove("./program.strerr");
+        //remove("./program.strout");
+        //remove("./program.strerr");
 
         return 0;
 
