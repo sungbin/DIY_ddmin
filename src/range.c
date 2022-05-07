@@ -275,7 +275,7 @@ char *
 range_increasing_dir (char * program_path, char * input_dir, char * input_name, int rs, char * err_msg, char * exe_dir) {
 
 	char input_path[256];
-	sprintf(input_path, "../%s", input_name);
+	sprintf(input_path, "../%s/%s", exe_dir, input_name);
 
 	long input_size = byte_count_file(input_path);
 	fprintf(stderr, "(range_increasing) last minimized: %s, %ld\n", input_path, input_size);
@@ -318,7 +318,8 @@ range_increasing_dir (char * program_path, char * input_dir, char * input_name, 
 				exit(1);
 			}
 
-			char path[256] = "../inputs/test_input";
+			char path[256];
+			sprintf(path, "../%s/inputs/test_input", exe_dir);
                         if (remove(path) == -1) {
                                 perror("ERROR: fail to remove test_input");
                                 exit(1);
@@ -336,7 +337,7 @@ range_increasing_dir (char * program_path, char * input_dir, char * input_name, 
                         if (e_code == 1) {
 				fclose(out_fp);
 				fclose(in_fp);
-				return range_increasing_dir(program_path, out_file, input_dir, rs, err_msg, exe_dir);
+				return range_increasing_dir(program_path, input_dir, out_file, rs, err_msg, exe_dir);
 			}
 
 		}
