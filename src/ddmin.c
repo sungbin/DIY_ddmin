@@ -278,7 +278,7 @@ ddmin_dir (char * program_path, char * input_dir, char * err_msg, char * exe_dir
 	long f_size;
 	int n = 2;
 	minimized_fname = malloc(sizeof(char)*256);
-	sprintf(minimized_fname, "../test_input"); // inputs/test_input
+	sprintf(minimized_fname, "../%s/test_input", exe_dir); // inputs/test_input
 	
 	while ((f_size = byte_count_file(minimized_fname)) > 1) {
 		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, iter_no);
