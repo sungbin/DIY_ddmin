@@ -3,7 +3,7 @@ cd php-src
 git checkout 70bd46cdacd9ffecd16c4672b6e42b8c0943cc48
 
 ./buildconf
-CC=clang CXX=clang++ CFLAGS="-g -fsanitize=address -fsanitize-coverage=edge,trace-pc-guard" \
+CC=clang CXX=clang++ \
 ./configure \
     --disable-all \
     --enable-fuzzer \
@@ -14,6 +14,5 @@ CC=clang CXX=clang++ CFLAGS="-g -fsanitize=address -fsanitize-coverage=edge,trac
     --enable-exif \
     --enable-mbstring \
     --enable-opcache
-    --disable-shared \
 
 make
