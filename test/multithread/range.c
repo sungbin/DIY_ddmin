@@ -77,8 +77,11 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char 
 
 	//data_list[THREAD_N-1] = data;
 
-	int (*fp)(void*) = test_range_func;
-	fp((void*)data);
+	void* (*fp)(void*) = test_range_func;
+	char * fail_path = fp((void*)data);
+	if (fail_path != NULL) {
+		 fprintf(stderr, "fail_path: %s \n", fail_path);
+	}
 	free(data);
 
         for (int i = 0; i < THREAD_N-1; i++) {
@@ -94,7 +97,13 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char 
 			fprintf(stderr, "PTHREAD_CANCELED: THREAD :%d", i);
 			exit(1);
 		}
-		////fprintf(stderr, "THREAD %d: return: %d\n", i, ()retval);
+		if (retval == NULL) {
+		
+		}
+		else {
+			char * fail_path = (char*)retval;
+			fprintf(stderr, "fail_path: %s \n", fail_path);
+		}
         }
 	
 	file_no = file_no + THREAD_N;
@@ -208,11 +217,11 @@ test_range (void *data) {
 		if (e_code == 1) {
 			fclose(out_fp);
 			fclose(null_fp);
-			fprintf(stderr, "FAIL: (%d,%d) \n", start, (start+rs));
+			fprintf(stderr, "THREAD: %d, FAIL: (%d,%d) \n", thread_n, start, (start+rs));
 			return (void*)out_path;
 		}
 		else {
-			fprintf(stderr, "PASS: (%d,%d) \n", start, (start+rs));
+			//fprintf(stderr, "PASS: (%d,%d) \n", start, (start+rs));
 		}
 	}
 

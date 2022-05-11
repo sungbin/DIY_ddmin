@@ -10,12 +10,16 @@
 #include "./include/range.h"
 #include "../../include/ddmin.h"
 
+char *
+range (char * program_path, char * input_path, int rs, char * err_msg);
 
 int
 main (int argc, char * argv[]) {
 
 	char * target_path = argv[1];
 	char * input_path = argv[2];
+	int rs = 1;
+	char * err_msg = "dump example/jsondump.c:44";
 
 	if (access(target_path, F_OK)) {
                 fprintf(stderr, "no program path: %s\n", target_path);
@@ -26,13 +30,16 @@ main (int argc, char * argv[]) {
                 fprintf(stderr, "no input path: %s\n", input_path);
                 exit(1);
         }	
+
 	printf("target: %s, input: %s \n", target_path, input_path);
 
-	char * err_msg = "dump example/jsondump.c:44";
+
+
+
 	long f_size = byte_count_file(input_path);
+
 	int fd;
 	char * mmap_addr;
-
 
 	if((fd = open(input_path, O_RDONLY)) == -1) {
 		perror("ERROR: open fd");
@@ -48,7 +55,6 @@ main (int argc, char * argv[]) {
 	fprintf(stderr, "f_size: %ld \n", f_size);
 	fprintf(stderr, "mmap_addr: %s \n", mmap_addr);
 
-	int rs = 370;
 	int max_range_n = (int)ceilf(((f_size - rs + 1) / (float)THREAD_N));
 
 	int ** parts = malloc(sizeof(int**)*THREAD_N);
