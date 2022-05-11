@@ -1,5 +1,8 @@
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/errno.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +19,7 @@ extern int file_no;
 extern int iter_no;
 
 void
-ranges (int ** parts, long f_size, int rs) {
+partitions (int ** parts, long f_size, int rs) {
 
 	int thread_idx = 0;
 	int idx = 0;
@@ -39,8 +42,10 @@ ranges (int ** parts, long f_size, int rs) {
 
 }
 
-void
-run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg) {
+int
+run_threads (char ** ret_list, int ** parts, void *test_range_func, int max_range_n, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg) {
+
+	int ret_cnt = 0;
 
 	pthread_t p_threads[THREAD_N];
 	struct pthread_data * data_list[THREAD_N];
@@ -79,10 +84,6 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char 
 
 	void* (*fp)(void*) = test_range_func;
 	char * fail_path = fp((void*)data);
-	if (fail_path != NULL) {
-		 fprintf(stderr, "fail_path: %s \n", fail_path);
-	}
-	free(data);
 
         for (int i = 0; i < THREAD_N-1; i++) {
 		void * retval;
@@ -102,11 +103,20 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char 
 		}
 		else {
 			char * fail_path = (char*)retval;
-			fprintf(stderr, "fail_path: %s \n", fail_path);
+			//fprintf(stderr, "fail_path: %s \n", fail_path);
+			ret_list[ret_cnt] = fail_path;
+			ret_cnt++;
 		}
         }
-	
-	file_no = file_no + THREAD_N;
+	if (fail_path != NULL) {
+		 //fprintf(stderr, "fail_path: %s \n", fail_path);
+		 ret_list[ret_cnt] = fail_path;
+		 ret_cnt++;
+	}
+	free(data);
+
+	//file_no = file_no + THREAD_N;
+	return ret_cnt;
 }
 
 // data: (int ** parts, int max_range_n)
@@ -132,13 +142,15 @@ test_range (void *data) {
 
 	FILE * null_fp = fopen("/dev/null", "wb");
 
-	fprintf(stderr, "THREAD: %d - out_idx - %s \n", thread_n, out_path);
+	//fprintf(stderr, "THREAD: %d - out_idx - %s \n", thread_n, out_path);
 
+	//int temp = 0;
 	for (int j = 0; j < max_range_n; j++) {
 		if (part[j] == -1) {
 			continue;
 		}
 		int start = part[j];
+		//fprintf(stderr, "%s - start: %d, rs: %d \n", out_path, start, rs);
 		//int end = start + rs;
 
 		if (lseek(out_fd, 0, SEEK_SET) == -1) {
@@ -164,7 +176,6 @@ test_range (void *data) {
 		while (_rs > 0) {
 			char buf[2048];
 			int buf_size;
-			//char * next_p = mmap_addr+(start+(rs-_rs))
 			
 			if (_rs < 2048) {	
 				buf_size = fwrite(mmap_addr+(start+(rs-_rs)), 1, _rs, null_fp);
@@ -181,10 +192,10 @@ test_range (void *data) {
 			int buf_size;
 
 			if (_end < 2048) {
-				buf_size = fwrite(mmap_addr+start+rs+(f_size-_end), 1, _end, out_fp);
+				buf_size = fwrite(mmap_addr+(f_size-_end), 1, _end, out_fp);
 			}
 			else {
-				buf_size = fwrite(mmap_addr+start+rs+(f_size-_end), 1, 2048, out_fp);
+				buf_size = fwrite(mmap_addr+(f_size-_end), 1, 2048, out_fp);
 			}
 			_end -= buf_size;
 		}
@@ -210,19 +221,22 @@ test_range (void *data) {
 		if ((++iter_no) % 1000 == 0) {
 			time_t t = time(NULL);
 			struct tm tm = *localtime(&t);
-			fprintf(stderr, "Test count:%d -  %d-%d-%d %d:%d:%d\n", iter_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+			fprintf(stderr, "(size=%ld, rs=%d)Test count:%d -  %d-%d-%d %d:%d:%d\n", f_size, rs, iter_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 		}
-		file_no++;
 		if (e_code == 1) {
 			fclose(out_fp);
 			fclose(null_fp);
-			fprintf(stderr, "THREAD: %d, FAIL: (%d,%d) \n", thread_n, start, (start+rs));
+			printf("minimized %s (%ld -> %ld) \n", out_path, f_size, (f_size-rs));
+			printf("begin: %d, rs:%d \n\n", start, rs);
 			return (void*)out_path;
 		}
 		else {
 			//fprintf(stderr, "PASS: (%d,%d) \n", start, (start+rs));
 		}
+		//if ((++temp) == 1) {
+		//	break;
+		//}
 	}
 
 	free(out_path);
@@ -230,4 +244,85 @@ test_range (void *data) {
 	fclose(null_fp);
 
 	return NULL;
+}
+
+int
+range_thread (char ** ret_list, char * program_path, char * input_path, int rs, char * err_msg) {
+
+	long f_size = byte_count_file(input_path);
+	int fd;
+	char * mmap_addr;
+
+	if((fd = open(input_path, O_RDONLY)) == -1) {
+		perror("ERROR: open fd");
+		exit(1);
+	}
+	mmap_addr = mmap(0, f_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (mmap_addr == MAP_FAILED) {
+		perror("mmap error");
+		exit(1);
+	}
+
+	//fprintf(stderr, "f_size: %ld \n", f_size);
+	//fprintf(stderr, "mmap_addr: %s \n", mmap_addr);
+
+	int max_range_n = (int)ceilf(((f_size - rs + 1) / (float)THREAD_N));
+
+	int ** parts = malloc(sizeof(int**)*THREAD_N);
+	for (int i = 0; i < THREAD_N; i++) {
+		parts[i] = malloc(sizeof(int*)*max_range_n);
+		for (int j = 0; j < max_range_n; j++) {
+			parts[i][j] = -1;
+		}
+	}
+
+	partitions(parts, f_size, rs);
+	//test_ranges(parts, max_range_n, rs);
+
+	/* ## thread start ## */
+	int ret_cnt = run_threads(ret_list, parts, test_range, max_range_n, rs, program_path, mmap_addr, f_size, err_msg);
+
+	for (int i = 0; i < THREAD_N; i++) {
+		free(parts[i]);
+	}
+	free(parts);
+	close(fd);
+
+	return ret_cnt;
+}
+
+char*
+range (char * program_path, char * input_path, char * err_msg) {
+
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	fprintf(stderr, "Test count:%d -  %d-%d-%d %d:%d:%d\n", iter_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+	long rs = byte_count_file(input_path)-1;
+	while (rs > 0) {
+
+        	char ** ret_list = malloc(sizeof(char*) * THREAD_N);
+        	int ret_cnt = range_thread(ret_list, program_path, input_path, rs, err_msg);
+
+		//fprintf(stderr, "rs: %ld, ret_cnt: %d \n", rs, ret_cnt);
+
+        	if (ret_cnt < 1) {
+                	free(ret_list);
+			rs--;
+			continue;
+        	}
+		
+        	// TODO: select one among many failing inputs
+        	for (int i = 1; i < ret_cnt; i++) {
+                	free(ret_list[i]);
+        	}
+		input_path = ret_list[0];
+		rs = byte_count_file(input_path)-1;
+		file_no += THREAD_N;
+
+		free(ret_list);
+	}
+
+	return input_path;
+
 }

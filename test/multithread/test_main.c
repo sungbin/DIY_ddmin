@@ -1,7 +1,4 @@
-#include <fcntl.h>
 #include <unistd.h>
-#include <sys/mman.h>
-#include <sys/errno.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,15 +7,12 @@
 #include "./include/range.h"
 #include "../../include/ddmin.h"
 
-char *
-range (char * program_path, char * input_path, int rs, char * err_msg);
 
 int
 main (int argc, char * argv[]) {
 
 	char * target_path = argv[1];
 	char * input_path = argv[2];
-	int rs = 1;
 	char * err_msg = "dump example/jsondump.c:44";
 
 	if (access(target_path, F_OK)) {
@@ -30,51 +24,18 @@ main (int argc, char * argv[]) {
                 fprintf(stderr, "no input path: %s\n", input_path);
                 exit(1);
         }	
-
+	
 	printf("target: %s, input: %s \n", target_path, input_path);
 
+	/*
+        char ** ret_list = malloc(sizeof(char*) * THREAD_N);
+        int ret_cnt = range_thread(ret_list, target_path, input_path, 1, err_msg);
 
+	free(ret_list);
+	*/	
 
-
-	long f_size = byte_count_file(input_path);
-
-	int fd;
-	char * mmap_addr;
-
-	if((fd = open(input_path, O_RDONLY)) == -1) {
-		perror("ERROR: open fd");
-		exit(1);
-	}
-
-	mmap_addr = mmap(0, f_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (mmap_addr == MAP_FAILED) {
-		perror("mmap error");
-		exit(1);
-	}
-
-	fprintf(stderr, "f_size: %ld \n", f_size);
-	fprintf(stderr, "mmap_addr: %s \n", mmap_addr);
-
-	int max_range_n = (int)ceilf(((f_size - rs + 1) / (float)THREAD_N));
-
-	int ** parts = malloc(sizeof(int**)*THREAD_N);
-	for (int i = 0; i < THREAD_N; i++) {
-		parts[i] = malloc(sizeof(int*)*max_range_n);
-		for (int j = 0; j < max_range_n; j++) {
-			parts[i][j] = -1;
-		}
-	}
-
-	ranges(parts, f_size, rs);
-	//test_ranges(parts, max_range_n, rs);
-
-	/* ## thread start ## */
-	run_threads(parts, test_range, max_range_n, rs, target_path, mmap_addr, f_size, err_msg);
-
-	for (int i = 0; i < THREAD_N; i++) {
-		free(parts[i]);
-	}
-	free(parts);
+	char * minimized = range(target_path, input_path, err_msg);
+	printf("last_minimized: %s \n", minimized);
 
 	return 0;
 
@@ -97,3 +58,4 @@ void test_ranges (int ** parts, int max_range_n, int rs) {
 	}
 	
 }
+

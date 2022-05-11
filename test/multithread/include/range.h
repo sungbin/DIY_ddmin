@@ -19,7 +19,13 @@ void *
 test_range (void *data);
 
 void
-ranges (int ** parts, long f_size, int rs);
+partitions (int ** parts, long f_size, int rs);
 
-void
-run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg);
+int
+run_threads (char ** ret_list, int ** parts, void *test_range_func, int max_range_n, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg);
+
+int
+range_thread (char ** ret_list, char * program_path, char * input_path, int rs, char * err_msg);
+
+char*
+range (char * program_path, char * input_path, char * err_msg);
