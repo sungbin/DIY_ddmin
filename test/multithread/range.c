@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <math.h>
@@ -26,12 +27,12 @@ ranges (int ** parts, long f_size, int rs) {
 		max_idx -= range_cnt;
 		thread_idx++;
 
-	} while(thread_idx < THREAD_N);
+	} while (thread_idx < THREAD_N);
 
 }
 
 void
-run_threads (int ** parts, void *test_range_func, int max_range_n, int rs) {
+run_threads (int ** parts, void *test_range_func, int max_range_n, int rs, char * mmap_addr) {
 
 	pthread_t p_threads[THREAD_N];
 	struct pthread_data * data_list[THREAD_N];
@@ -42,6 +43,7 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs) {
                 data->max_range_n = max_range_n;
                 data->thread_n = i;
                 data->rs = rs;
+		data->mmap_addr = mmap_addr;
 		data_list[i] = data;
                 int rc = pthread_create(&p_threads[i], NULL, test_range_func, (void*)data);
                 if (rc) {
@@ -55,6 +57,7 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs) {
         data->max_range_n = max_range_n;
         data->thread_n = THREAD_N-1;
         data->rs = rs;
+	data->mmap_addr = mmap_addr;
 	data_list[THREAD_N-1] = data;
 
 	int (*fp)(void*) = test_range_func;
@@ -62,7 +65,7 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs) {
 	free(data);
 
         int ret;
-        for (int i = 0; i < THREAD_N-1; i++) {
+        for (int i = 1; i < THREAD_N-6; i++) {
                 int rc = pthread_join(p_threads[i], (void*)&ret);
                 if (rc == -1) {
                         fprintf(stderr,"\nERROR: # Thread join %d \n", i);
@@ -70,8 +73,8 @@ run_threads (int ** parts, void *test_range_func, int max_range_n, int rs) {
                 }
 		free(data_list[i]);
         }
-
 }
+
 // data: (int ** parts, int max_range_n)
 void * 
 test_range (void *data) {
@@ -81,6 +84,7 @@ test_range (void *data) {
 	int max_range_n = p_data->max_range_n;
 	int thread_n = p_data->thread_n;
 	int rs = p_data->rs;
+	char * mmap_addr = p_data->mmap_addr;
 
 	for (int j = 0; j < max_range_n; j++) {
 		if (part[j] == -1) {
@@ -89,11 +93,18 @@ test_range (void *data) {
 		int start = part[j];
 		int end = start + rs;
 
-		fprintf(stderr,"(%d, %d) ", start, end);
+		// TODO: file write
+		char str[1024];
+		strncpy(str, mmap_addr, rs);
+		str[start+rs] = 0x0;
+		fprintf(stderr,"(%d, %d) str: %s", start, end, str);
+
+		// TODO: RUNNER TEST
+		
 	}
 
-	int * ret = malloc(sizeof(int));
-	ret[0] = 1;
+	int * ret  = malloc(sizeof(int));
+	*ret = 1;
 	return (void*)(ret);
 }
 

@@ -1,6 +1,7 @@
-#include <sys/errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/mman.h>
+#include <sys/errno.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +28,24 @@ main (int argc, char * argv[]) {
 	printf("target: %s, input: %s \n", target_path, input_path);
 
 	long f_size = byte_count_file(input_path);
+	int fd;
+	char * mmap_addr;
+
+
+	if((fd = open(input_path, O_RDONLY)) == -1) {
+		perror("ERROR: open fd");
+		exit(1);
+	}
+	//mmap(mmap_addr, f_size, PROT_READ, MAP_SHARED, fd, 0);
+	mmap_addr = mmap(0, f_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (mmap_addr == MAP_FAILED) {
+		perror("mmap error");
+		exit(1);
+	}
+
+	fprintf(stderr, "f_size: %ld \n", f_size);
+	fprintf(stderr, "mmap_addr: %s \n", mmap_addr);
+
 	int rs = 300;
 	int max_range_n = (int)ceilf(((f_size - rs + 1) / (float)THREAD_N));
 
@@ -38,12 +57,11 @@ main (int argc, char * argv[]) {
 		}
 	}
 
-
 	ranges(parts, f_size, rs);
-	//test_ranges(parts, THREAD_N, max_range_n, rs);
+	//test_ranges(parts, max_range_n, rs);
 
 	/* ## thread start ## */
-	run_threads(parts, test_range, max_range_n, rs);
+	run_threads(parts, test_range, max_range_n, rs, mmap_addr);
 
 	for (int i = 0; i < THREAD_N; i++) {
 		free(parts[i]);
