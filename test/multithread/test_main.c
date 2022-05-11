@@ -10,6 +10,7 @@
 #include "./include/range.h"
 #include "../../include/ddmin.h"
 
+
 int
 main (int argc, char * argv[]) {
 
@@ -27,6 +28,7 @@ main (int argc, char * argv[]) {
         }	
 	printf("target: %s, input: %s \n", target_path, input_path);
 
+	char * err_msg = "dump example/jsondump.c:44";
 	long f_size = byte_count_file(input_path);
 	int fd;
 	char * mmap_addr;
@@ -36,7 +38,7 @@ main (int argc, char * argv[]) {
 		perror("ERROR: open fd");
 		exit(1);
 	}
-	//mmap(mmap_addr, f_size, PROT_READ, MAP_SHARED, fd, 0);
+
 	mmap_addr = mmap(0, f_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (mmap_addr == MAP_FAILED) {
 		perror("mmap error");
@@ -46,7 +48,7 @@ main (int argc, char * argv[]) {
 	fprintf(stderr, "f_size: %ld \n", f_size);
 	fprintf(stderr, "mmap_addr: %s \n", mmap_addr);
 
-	int rs = 300;
+	int rs = 370;
 	int max_range_n = (int)ceilf(((f_size - rs + 1) / (float)THREAD_N));
 
 	int ** parts = malloc(sizeof(int**)*THREAD_N);
@@ -61,7 +63,7 @@ main (int argc, char * argv[]) {
 	//test_ranges(parts, max_range_n, rs);
 
 	/* ## thread start ## */
-	run_threads(parts, test_range, max_range_n, rs, mmap_addr);
+	run_threads(parts, test_range, max_range_n, rs, target_path, mmap_addr, f_size, err_msg);
 
 	for (int i = 0; i < THREAD_N; i++) {
 		free(parts[i]);
@@ -69,7 +71,9 @@ main (int argc, char * argv[]) {
 	free(parts);
 
 	return 0;
+
 }
+
 void test_ranges (int ** parts, int max_range_n, int rs) {
 
 	for (int i = 0; i < THREAD_N; i++) {
