@@ -15,7 +15,7 @@ OBJS    = $(addprefix $(BINDIR), $(_OBJS))
 all: $(BIN)
 
 $(BIN): $(BINDIR) ddmin main runner range
-	$(CC) $(OBJS) -g -o $(BIN) -lm
+	$(CC) $(OBJS) -g -o $(BIN) -lpthread -lm
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
