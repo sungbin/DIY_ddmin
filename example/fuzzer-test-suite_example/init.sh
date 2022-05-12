@@ -9,6 +9,27 @@
 #../fuzzer-test-suite/sqlite-2016-11-14/build.sh
 #cd ..
 
+#mkdir harfbuzz
+#cd harfbuzz
+#../fuzzer-test-suite/harfbuzz-1.3.2/build.sh
+#cd ..
+
+#mkdir lcms
+#cd lcms
+#../fuzzer-test-suite/lcms-2017-03-21/build.sh
+#cd ..
+
+#mkdir openthread
+#cd openthread
+#REVISION=ab4073980f120bbd4eb9f6d58950f2f03f88dac3 ${FTS}../fuzzer-test-suite/openthread-2018-02-27/build.sh
+#cd ..
+
+#mkdir vorbis
+#cd vorbis
+#../fuzzer-test-suite/vorbis-2017-12-11/build.sh
+#..
+
+
 rm ./reduce
 cd source
 #gcc main_f-test-suite.c ddmin_f-test-suite.c range_f-test-suite.c runner_f-test-suite.c -g -o ../reduce -lm

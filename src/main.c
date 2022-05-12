@@ -30,7 +30,7 @@ main (int argc, char * argv[]) {
 		printf("applied ddmin result: %s\n", result);
 	}
 	else if (strcmp(argv[3], "range_increasing") == 0) {
-		result = range_increasing(argv[1], strdup(argv[2]), 1, argv[4]);
+		result = range_increasing(argv[1], strdup(argv[2]), argv[4]);
 		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
 		printf("applied range-decending result: %s\n", result);
 	}

@@ -47,7 +47,7 @@ main (int argc, char * argv[]) {
 
 
 	#include "../../../include/range.h"
-	char * result = range(program_path, f_name, 50, err_msg);
+	char * result = range(program_path, f_name, 500, err_msg);
 
 	printf("result: %s\n", result);
 
