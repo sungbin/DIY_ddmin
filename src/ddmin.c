@@ -234,11 +234,17 @@ byte_count_file (char * path) {
 int
 test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg) {
 	
-	FILE * t_fp = fopen("./program.strerr", "wb");
-	fclose(t_fp);
-	runner_error_code error_code = runner(program_path, input_seq_path, "./program.strout", "./program.strerr");
+	char stdout_path[256];
+	char stderr_path[256];
 
-        FILE * fp = fopen("./program.strerr", "rb");
+	sprintf(stdout_path, "./%s.stdout", input_seq_path);
+	sprintf(stderr_path, "./%s.stderr", input_seq_path);
+
+	FILE * t_fp = fopen(stderr_path, "wb");
+	fclose(t_fp);
+	runner_error_code error_code = runner(program_path, input_seq_path, stderr_path, stderr_path);
+
+        FILE * fp = fopen(stderr_path, "rb");
 	if (fp == 0x0) {
 		perror("test_buffer_overflow()");
 		exit(1);
@@ -248,15 +254,16 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
         while (fgets(line, 512, fp) != 0x0) {
                 if (strstr(line, err_msg) != 0x0) {
                         fclose(fp);
-                        remove("./program.strout");
-                        remove("./program.strerr");
+                        remove(stdout_path);
+                        remove(stderr_path);
                         return 1;
                 }
         }
 
         fclose(fp);
-        //remove("./program.strout");
-        //remove("./program.strerr");
+
+        remove(stdout_path);
+        remove(stderr_path);
 
         return 0;
 

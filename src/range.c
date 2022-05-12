@@ -311,7 +311,6 @@ range_dir (char * program_path, char * input_dir, char * input_name, int rs, cha
 	sprintf(input_path, "../%s/%s", exe_dir, input_name);
 
 	long input_size = byte_count_file(input_path);
-	fprintf(stderr, "last minimized: %s, %ld\n", input_path, input_size);
 	
 	char * out_file = calloc(sizeof(char), 512);
 	sprintf(out_file, "../%s/%d.part", exe_dir, ++iter_no);
@@ -322,7 +321,7 @@ range_dir (char * program_path, char * input_dir, char * input_name, int rs, cha
 	int out_fd = fileno(out_fp);
 
 	while (rs > 0) {
-		fprintf(stderr,"rs:%d\n", rs);
+		//fprintf(stderr,"rs:%d\n", rs);
 		for (int begin = 0; begin <= input_size - rs; begin++) {
 
 			init_cursor(in_fd, out_fd);
@@ -369,6 +368,9 @@ range_dir (char * program_path, char * input_dir, char * input_name, int rs, cha
 			}
 			file_no++;
                         if (e_code == 1) {
+				fprintf(stderr, "last minimized: %s (%ld -> %ld) \n", out_file, input_size, (input_size-rs));
+				fprintf(stderr, "begin: %d, rs: %d \n\n", begin, rs);
+
 				fclose(out_fp);
 				fclose(in_fp);
 				return range_dir(program_path, input_dir, out_file, rs, err_msg, exe_dir);

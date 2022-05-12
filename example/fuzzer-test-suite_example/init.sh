@@ -33,5 +33,5 @@ cd ..
 rm ./reduce
 cd source
 #gcc main_f-test-suite.c ddmin_f-test-suite.c range_f-test-suite.c runner_f-test-suite.c -g -o ../reduce -lm
-gcc ../../../src/main.c ../../../src/ddmin.c ../../../src/range.c runner_f-test-suite.c -g -o ../reduce -lm
+gcc ../../../src/main.c ../../../src/ddmin.c ../../../src/range_thread.c runner_f-test-suite.c -g -o ../reduce -lpthread  -lm
 cd ..
