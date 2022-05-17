@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../include/ddmin.h"
 #include "../include/runner.h"
@@ -23,6 +24,10 @@ main (int argc, char * argv[]) {
 		exit(1);
 	}
 
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	fprintf(stderr, "START:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
 	char * result;
 	if(argv[3][0]=='d') {
 		result = ddmin(argv[1], argv[2], argv[4]);
@@ -30,7 +35,7 @@ main (int argc, char * argv[]) {
 		printf("applied ddmin result: %s\n", result);
 	}
 	else if (strcmp(argv[3], "range_increasing") == 0) {
-		result = range_increasing(argv[1], strdup(argv[2]), 1, argv[4]);
+		result = range_increasing(argv[1], strdup(argv[2]), argv[4]);
 		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
 		printf("applied range-decending result: %s\n", result);
 	}
@@ -39,6 +44,10 @@ main (int argc, char * argv[]) {
 		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
 		printf("applied range result: %s\n", result);
 	}
+
+	t = time(NULL);
+	tm = *localtime(&t);
+	fprintf(stderr, "END:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 	if (result != argv[2]) {
 		free(result);

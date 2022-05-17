@@ -102,3 +102,7 @@ Temporary Items
 
 # End of https://www.toptal.com/developers/gitignore/api/c,linux,osx
 bin
+
+# SB Setting
+example/fuzzer-test-suite_example/script*
+example/fuzzer-test-suite_example/result*

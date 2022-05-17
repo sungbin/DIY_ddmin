@@ -191,7 +191,7 @@ range_increasing_dir (char * program_path, char * input_dir, char * input_name, 
 			if (file_no % 1000 == 0) {
 				time_t t = time(NULL);
 				struct tm tm = *localtime(&t);
-				printf("Test count:%d -  %d-%d-%d %d:%d:%d\n", file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+				fprintf(stderr, "Test count:%d -  %d-%d-%d %d:%d:%d\n", file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 			}
 			file_no++;
