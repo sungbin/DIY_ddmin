@@ -1,5 +1,6 @@
 #define THREAD_N 8
 
+/*
 struct pthread_data {
 	int * part;
 	int max_range_n;
@@ -11,6 +12,31 @@ struct pthread_data {
 	long f_size;
 	int out_idx;
 };
+*/
+
+struct range_data {
+
+	char * checked_arr;
+	int rs;
+	char * program_path;
+	char * mmap_addr;
+	long f_size;
+	char * err_msg;
+};
+
+struct pthread_data {
+
+	struct range_data * range_data;
+	int thread_n;
+	int out_idx;
+};
+
+/*
+struct pthread_result {
+	char * file_path;
+	int start;
+};
+*/
 
 void 
 test_ranges (int ** parts, int max_range_n, int rs);
@@ -18,11 +44,8 @@ test_ranges (int ** parts, int max_range_n, int rs);
 void * 
 test_range (void *data);
 
-void
-partitions (int ** parts, long f_size, int rs);
-
 int
-run_threads (char ** ret_list, int ** parts, void *test_range_func, int max_range_n, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg);
+run_threads (char ** ret_list, void *test_range_func, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg);
 
 int
 range_thread (char ** ret_list, char * program_path, char * input_path, int rs, char * err_msg);
