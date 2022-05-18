@@ -23,6 +23,8 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         /* Child process */
         if (pid == 0) { 
 
+		//putenv("ASAN_OPTIONS=detect_leaks=0:halt_on_error=1");
+
 		int input_fd = open(input_path, O_RDONLY);
                 int out_fd = open(output_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
                 int out_err_fd = open(output_err_path, O_WRONLY | O_CREAT, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
@@ -41,7 +43,7 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         start = ((int)clock()) / CLOCKS_PER_SEC;
         end = ((int)clock()) / CLOCKS_PER_SEC;
 
-        while ((end - start) < 1) {
+        while ((end - start) < 3) {
 		int w = waitpid(pid, &status, WNOHANG);
 		if (w != 0) {
 			break;
@@ -50,7 +52,7 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
 	}
 
 	int exit_stated = WEXITSTATUS(status);
-	if ((end - start) >= 1) {
+	if ((end - start) >= 3) {
 		// Time out Kill
 		kill(pid, SIGKILL);
 		wait(&status);

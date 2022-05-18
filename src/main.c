@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../include/ddmin.h"
 #include "../include/runner.h"
@@ -12,6 +13,8 @@ read_file (char * input_path);
 extern int file_no;
 extern int iter_no;
 
+//extern int * checked_arr;
+
 int
 main (int argc, char * argv[]) {
 	
@@ -22,6 +25,10 @@ main (int argc, char * argv[]) {
 		printf("ERROR: input paprameters must be argv[0]: jsondump-path, argv[1]: crash-json-path, argv[2]: [ddmin, mymin], argv[3]: error-msg\n");
 		exit(1);
 	}
+
+	time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        fprintf(stderr, "START:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 	char * result;
 	if(argv[3][0]=='d') {
@@ -39,6 +46,10 @@ main (int argc, char * argv[]) {
 		printf("The times of execute %d, iteration: %d \n", file_no, iter_no);
 		printf("applied range result: %s\n", result);
 	}
+
+	t = time(NULL);
+        tm = *localtime(&t);
+        fprintf(stderr, "END:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 	if (result != argv[2]) {
 		free(result);
