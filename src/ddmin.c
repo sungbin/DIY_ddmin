@@ -17,7 +17,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 int file_no = 0;
-int iter_no = 1;
+int fail_no = 0;
 char * minimized_fname = 0x0;
 
 // return value: minimum input path
@@ -41,7 +41,7 @@ ddmin (char * program_path, char * byte_seq_path, char * err_msg) {
 	strcpy(minimized_fname, byte_seq_path);
 
 	while ((f_size = byte_count_file(minimized_fname)) > 1) {
-		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, iter_no);
+		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, fail_no);
 
 		FILE * in_fp = fopen(minimized_fname, "rb");
 		if (in_fp == 0x0) {
@@ -294,7 +294,7 @@ ddmin_dir (char * program_path, char * input_dir, char * err_msg, char * exe_dir
 	sprintf(minimized_fname, "../%s/test_input", exe_dir); // inputs/test_input
 	
 	while ((f_size = byte_count_file(minimized_fname)) > 1) {
-		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, iter_no);
+		fprintf(stderr, "len: %ld, n: %d, path: %s, file_no: %d\n", f_size, n, minimized_fname, fail_no);
 
 		FILE * in_fp = fopen(minimized_fname, "rb");
 		if (in_fp == 0x0) {

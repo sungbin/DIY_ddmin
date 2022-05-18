@@ -9,6 +9,11 @@ struct pthread_data {
 	int thread_idx;
 };
 
+struct pthread_return {
+	char ** fail_arr;
+	int fail_n;
+};
+
 void 
 test_ranges (int ** parts, int max_range_n, int rs);
 
