@@ -229,17 +229,19 @@ range (char * program_path, char * input_path, int rs, char * err_msg) {
 	fprintf(stderr, "last minimized: %s, %ld (used_test: %d)\n", input_path, input_size, file_no-last_file_no);
 	last_file_no = file_no;
 	
-	char * out_file = calloc(sizeof(char), 512);
+	char out_file[16];
 	sprintf(out_file, "./%d.part", ++iter_no);
 
 	FILE * in_fp = fopen(input_path, "rb");
-	FILE * out_fp = fopen(out_file, "wb");
 	int in_fd = fileno(in_fp);
+	FILE * out_fp = fopen(out_file, "wb");
 	int out_fd = fileno(out_fp);
 	FILE * null_fp = fopen("/dev/null", "wb");
 
 	while (rs > 0) {
 		//fprintf(stderr,"rs:%d\n", rs);
+		char fail_path_arr[2048][16];
+		int f_cnt = 0;
 		for (int begin = 0; begin <= input_size - rs; begin++) {
 			
 			//fprintf(stderr, "rs=%d, begin=%d \n", rs, begin);
@@ -286,13 +288,28 @@ range (char * program_path, char * input_path, int rs, char * err_msg) {
 			file_no++;
                         if (e_code == 1) {
 				fclose(out_fp);
-				fclose(in_fp);
-				fclose(null_fp);
-				free(input_path);
-				return range(program_path, out_file, rs, err_msg);
+
+				strcpy(fail_path_arr[f_cnt], out_file);
+				f_cnt++;
+
+				sprintf(out_file, "./%d.part", ++iter_no);
+				out_fp = fopen(out_file, "wb");
+				out_fd = fileno(out_fp);
+
+				//return range(program_path, out_file, rs, err_msg);
 			}
 		}
-		rs--;
+		if (f_cnt > 0) {
+			int rand_idx = rand()%f_cnt;
+			fprintf(stderr, "select %d in [0, %d) \n", rand_idx, f_cnt);
+			fclose(in_fp);
+			fclose(null_fp);
+			free(input_path);
+			return range(program_path, strdup(fail_path_arr[rand_idx]), rs, err_msg);
+		}
+		else {
+			rs--;
+		}
 	}
 	fclose(null_fp);
 	fclose(out_fp);
