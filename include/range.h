@@ -7,12 +7,22 @@ struct pthread_data {
         int rs;
         char * err_msg;
 	int thread_idx;
+
+	int total_finded_n;
+	char * out_file;
+	FILE * in_fp;
+	FILE * out_fp;
+	FILE * null_fp;
+	int in_fd;
+	int out_fd;
 };
 
+/*
 struct pthread_return {
 	char ** fail_arr;
 	int fail_n;
 };
+*/
 
 void 
 test_ranges (int ** parts, int max_range_n, int rs);

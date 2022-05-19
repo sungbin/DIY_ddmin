@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <math.h>
 #include <pthread.h>
+#include <errno.h>
 
 
 #include "../include/range.h"
@@ -24,128 +25,71 @@ extern int file_no;
 extern int fail_no;
 
 struct pthread_data ** p_data_arr;
-int * checked_rs_arr = 0x0;
-int * checked_begin_arr = 0x0;
+//int * checked_rs_arr = 0x0;
+//int * checked_begin_arr = 0x0;
 
 pthread_mutex_t begin_mt;
 pthread_mutex_t wait_mt;
 pthread_mutex_t rs_mt;
 
-int finished;
-int cur_rs;
-int wait_cnt = 0;
+int begin;
+//int finished;
+//int cur_rs;
+//int wait_cnt = 0;
 
 void * 
 test_range (void *data) {
 	
 	struct pthread_data * d = (struct pthread_data*) data;
 
-	char out_file[256];
-	sprintf(out_file, "./thread%d.part", d->thread_idx);
-	
-	FILE * in_fp = fopen(d->input_path, "rb");
-	int in_fd = fileno(in_fp);
-	FILE * null_fp = fopen("/dev/null", "wb");
+	int start;
 
-	FILE * out_fp = fopen(out_file, "wb");
-	if (out_fp == NULL) {
-		perror("ERROR: open *FILE: out_fp");
-		exit(1);
-	}
-	int out_fd = fileno(out_fp);
+	do {
 
-	while (d->rs > 0) {
-		char fail_path_arr[2048][16];
-		int f_cnt = 0;
+		pthread_mutex_lock(&begin_mt);
+		start = begin;
+		if (start > d->input_size - d->rs) {
+			pthread_mutex_unlock(&begin_mt);
+			break;
+		}
+		begin++;
+		pthread_mutex_unlock(&begin_mt);
+		//fprintf(stderr, "lock (th=%d, rs=%d, begin=%d, out=%s) \n", d->thread_idx, d->rs, start, d->out_file);
 
-		for (int begin = 0; begin <= d->input_size - d->rs; begin++) {
-
-			pthread_mutex_lock(&begin_mt);
-                	while (checked_begin_arr[begin]) {
-                        	begin++;
-                	}
-                	if (begin > (d->input_size - d->rs)) {
-                        	pthread_mutex_unlock(&begin_mt);
-                        	break;
-                	}
-                	checked_begin_arr[begin] = 1;
-                	pthread_mutex_unlock(&begin_mt);
-	
-
-			init_cursor(in_fd, out_fd);
-			read_and_write(in_fp, out_fp, begin); //prefix
-			read_and_write(in_fp, null_fp, d->rs); //rs
-			read_and_write(in_fp, out_fp, d->input_size - (begin + d->rs)); //postfix
-			if (fflush(out_fp) == -1) {
-				perror("ERROR: flush");
+		init_cursor(d->in_fd, d->out_fd);
+		read_and_write(d->in_fp, d->out_fp, start); //prefix
+		read_and_write(d->in_fp, d->null_fp, d->rs); //rs
+		read_and_write(d->in_fp, d->out_fp, d->input_size - (start + d->rs)); //postfix
+		if (fflush(d->out_fp) == -1) {
+			perror("ERROR: flush");
+			exit(1);
+		}
+		int bt;
+		if ((bt = byte_count_file(d->out_file)) > (d->input_size - d->rs)) {
+			if (truncate(d->out_file, d->input_size - d->rs) == -1) {
+				perror("ERROR: subset truncate");
 				exit(1);
 			}
-			int bt;
-			if ((bt = byte_count_file(out_file)) > (d->input_size - d->rs)) {
-				if (truncate(out_file, d->input_size - d->rs) == -1) {
-					perror("ERROR: subset truncate");
-					exit(1);
-				}
-			}
-			else if (bt < (d->input_size - d->rs)) {
-				fprintf(stderr, "ERROR: few written. bt:%d, correct: %ld \n", bt, (d->input_size - d->rs));
-				exit(1);
-			}
-			int e_code = test_buffer_overflow(d->program_path, out_file, d->err_msg);
-			if (file_no % 1000 == 0) {
-				time_t t = time(NULL);
-				struct tm tm = *localtime(&t);
-				fprintf(stderr, "(rs=%d)Test count:%d -  %d-%d-%d %d:%d:%d\n", d->rs, file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-			}
-			file_no++;
-	
-			if (e_code == 1) {
-				fclose(out_fp);
-				cur_rs = d->rs;
-				strcpy(fail_path_arr[f_cnt], out_file);
-                                f_cnt++;
-				sprintf(out_file, "./thread%d.part", (d->thread_idx + (THREAD_N*f_cnt)));
-				out_fp = fopen(out_file, "wb");
-				finished = 1;
-			}
 		}
-
-		pthread_mutex_lock(&wait_mt);
-		wait_cnt++;
-		pthread_mutex_unlock(&wait_mt);
-		while ((wait_cnt % 8 != 0) && !(checked_rs_arr[d->rs])) { }
-
-		if (finished) {
-			fclose(null_fp);
-			fclose(out_fp);
-			fclose(in_fp);
-
-			if (f_cnt < 1) {
-				return NULL;
-			}
-			char ** fail_arr = malloc(sizeof(char*)*f_cnt);
-			for (int j = 0; j < f_cnt; j++) {
-				fail_arr[j] = strdup(fail_path_arr[j]);
-			}
-			struct pthread_return * ret = malloc(sizeof(struct pthread_return));
-			ret->fail_arr = fail_arr;
-			ret->fail_n = f_cnt;
-			return ret;
+		else if (bt < (d->input_size - d->rs)) {
+			fprintf(stderr, "ERROR: few written. bt:%d, correct: %ld \n", bt, (d->input_size - d->rs));
+			exit(1);
 		}
-
-		pthread_mutex_lock(&rs_mt);
-		if (checked_rs_arr[d->rs] == 0) {
-			wait_cnt = 0;
-			memset(checked_begin_arr, 0, sizeof(int)*(d->input_size - d->rs + 1));
-			checked_rs_arr[d->rs] = 1;
+		int e_code = test_buffer_overflow(d->program_path, d->out_file, d->err_msg);
+		if (file_no % 1000 == 0) {
+			time_t t = time(NULL);
+			struct tm tm = *localtime(&t);
+			fprintf(stderr, "(rs=%d)Test count:%d -  %d-%d-%d %d:%d:%d\n", d->rs, file_no, tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 		}
-		pthread_mutex_unlock(&rs_mt);
-		d->rs--;
-	}
+		file_no++;
 
-	fclose(null_fp);
-	fclose(out_fp);
-	fclose(in_fp);
+		if (e_code == 1) {
+
+			return d->out_file;
+		}
+		//fprintf(stderr, "unlock (th=%d, rs=%d, begin=%d, out=%s) \n", d->thread_idx, d->rs, start, d->out_file);
+	} while (start <= d->input_size - d->rs);
+
 	return NULL;
 }
 
@@ -153,104 +97,151 @@ test_range (void *data) {
 char*
 _range (char * program_path, char * input_path, char * err_msg, long input_size, int rs) {
 
+	fprintf(stderr, "last minimized: %s, %d\n", input_path, input_size);
 	int last_file_no = file_no;
 
 	pthread_t p_threads[THREAD_N];
-	wait_cnt = 0;
-	finished = 0;
+	
+	//fprintf(stderr, "_range program_path=%s, input_path=%s, input_size=%ld, rs=%d \n", program_path, input_path, input_size, rs);
 
 	for (int i = 0; i < THREAD_N; i++) {
-		struct pthread_data * p_data = p_data_arr[i];
-		p_data->program_path = program_path;
-		p_data->input_path = input_path;
-		p_data->input_size = input_size;
-		p_data->err_msg = err_msg;
-		p_data->rs = rs;
-		p_data->thread_idx = i;
-		int rc = pthread_create(&p_threads[i], NULL, test_range, (void*) p_data);
-		if (rc) {
-			perror("ERROR: pthread create");
-			exit(1);
+		struct pthread_data * p = p_data_arr[i];
+		p->program_path = program_path;
+		p->input_path = input_path;
+		p->input_size = input_size;
+		p->err_msg = err_msg;
+		p->thread_idx = i;
+
+		if (p->in_fp != 0x0) {
+			fclose(p->in_fp);
 		}
+		p->in_fp = fopen(input_path, "rb");
+		p->in_fd = fileno(p->in_fp);
+		char * out_file = malloc(sizeof(char) * 32);
+		sprintf(out_file, "./thread%d.part", (p->thread_idx+THREAD_N*p->total_finded_n));
+		p->out_file = out_file;
+		p->out_fp = fopen(out_file, "wb");
+		p->out_fd = fileno(p->out_fp);
+
 	}
-	char * fail_arr[2048];
-	int fail_n = 0;
-	void * retval;
-	int first_finished_idx = -1;
 
-	for (int i = 0; i < THREAD_N; i++) {
-		if (i == first_finished_idx) {
-			continue;
+	for (int cur_rs = rs; cur_rs > 0; cur_rs--) {
+
+		begin = 0;
+		
+		for (int i = 0; i < THREAD_N; i++) {
+			p_data_arr[i]->rs = cur_rs;
+			int rc = pthread_create(&p_threads[i], NULL, test_range, (void*) p_data_arr[i]);
+			if (rc) {
+				perror("ERROR: pthread create");
+				exit(1);
+			}
 		}
+
+		char * fail_arr[2048];
+		int fail_n = 0;
+		int is_terminated_th_arr[THREAD_N] = { 0 };
 		void * retval;
-		int rc = pthread_join(p_threads[i], &retval);
-		if (rc == -1) {
-			fprintf(stderr,"\nERROR: # Thread join %d \n", i);
-		}
-		if (retval != NULL) {
-			struct pthread_return * r = (struct pthread_return*) retval;
-			for (int j = 0; j < r->fail_n; j++) {
-				fail_arr[fail_n++] = r->fail_arr[j];
+
+
+		
+		do {
+			for (int i = 0; i < THREAD_N; i++) {
+				if (is_terminated_th_arr[i]) {
+					continue;
+				}
+				int rc = pthread_tryjoin_np(p_threads[i], &retval);
+				if (rc != 0) {
+					continue;
+				}
+				if (retval != NULL) {
+
+					char * fail_path = (char*) retval;
+					fail_arr[fail_n++] = fail_path;
+
+					fclose(p_data_arr[i]->out_fp);
+					p_data_arr[i]->total_finded_n++;
+					p_data_arr[i]->out_file = malloc(sizeof(char) * 32);
+					sprintf(p_data_arr[i]->out_file, "./thread%d.part", (p_data_arr[i]->thread_idx+THREAD_N*p_data_arr[i]->total_finded_n));
+					p_data_arr[i]->out_fp = fopen(p_data_arr[i]->out_file, "wb");
+					p_data_arr[i]->out_fd = fileno(p_data_arr[i]->out_fp);
+
+					int rc = pthread_create(&p_threads[i], NULL, test_range, (void*) p_data_arr[i]);
+					if (rc) {
+						perror("ERROR: pthread create");
+						exit(1);
+					}
+				}
+				else {
+					is_terminated_th_arr[i] = 1;
+				}
+			}
+		} while (begin <= input_size - rs);
+
+		for (int i = 0; i < THREAD_N; i++) {
+
+			if (! is_terminated_th_arr[i]) {
+
+				int rc = pthread_join(p_threads[i], &retval);
+				if (rc != 0) {
+					perror("fail: pthread_join()");
+					exit(1);
+				}
+				if (retval != NULL) {
+
+					char * fail_path = (char*) retval;
+					fail_arr[fail_n++] = fail_path;
+
+					fclose(p_data_arr[i]->out_fp);
+					p_data_arr[i]->total_finded_n++;
+					p_data_arr[i]->out_file = malloc(sizeof(char) * 32);
+					sprintf(p_data_arr[i]->out_file, "./thread%d.part", (p_data_arr[i]->thread_idx+THREAD_N*p_data_arr[i]->total_finded_n));
+					p_data_arr[i]->out_fp = fopen(p_data_arr[i]->out_file, "wb");
+					p_data_arr[i]->out_fd = fileno(p_data_arr[i]->out_fp);
+
+				}
 			}
 		}
-	}
-
-	if (fail_n < 1) {
-		return input_path;
-	}
-	else {
-
-		int rand_idx = rand()%fail_n;
-		fprintf(stderr, "select %d in [0, %d) \n", rand_idx, fail_n);
-		char * finded_path = fail_arr[rand_idx];
-
-		for (int i = 0; i < fail_n; i++) {
-			if (i != rand_idx) {
-				free(fail_arr[i]);
+		
+		if (fail_n > 0) {
+	
+			int rand_idx = rand()%fail_n;
+			fprintf(stderr, "select %d in [0, %d) \n", rand_idx, fail_n);
+			char * finded_path = fail_arr[rand_idx];
+	
+			for (int i = 0; i < fail_n; i++) {
+				if (i != rand_idx) {
+					free(fail_arr[i]);
+				}
 			}
+	
+			finded_path = _range(program_path, finded_path, err_msg, (input_size-cur_rs), MIN(cur_rs, (input_size-cur_rs-1)));
+			return finded_path;
 		}
-
-		char * out_file = calloc(sizeof(char), 512);
-        	sprintf(out_file, "./%d.part", ++fail_no);
-
-		fprintf(stderr, "last minimized: %ld -> %ld(%s), used_test=%d\n", input_size, (input_size-cur_rs), out_file,(file_no-last_file_no));
-		int rv = rename(finded_path, out_file);
-		free(finded_path);
-		if (rv == -1) {
-			fprintf(stderr, "%s (%s->%s)",strerror(errno), finded_path, out_file);
-			exit(1);
-		}
-
-		memset(checked_begin_arr, 0, sizeof(int)*(input_size));
-		memset(checked_rs_arr, 0, sizeof(int)*(input_size));
-
-		finded_path = _range(program_path, out_file, err_msg, (input_size-cur_rs), MIN(cur_rs, (input_size-cur_rs-1)));
-		return finded_path;
 	}
+	return input_path;
 }
 
 char *
 range (char * program_path, char * input_path, char * err_msg) {
 
 	long input_size = byte_count_file(input_path);
-	checked_begin_arr = malloc(sizeof(int) * input_size);
-	checked_rs_arr = malloc(sizeof(int) * input_size);
-	memset(checked_begin_arr, 0, sizeof(int)*(input_size));
-	memset(checked_rs_arr, 0, sizeof(int)*(input_size));
 	p_data_arr = malloc(sizeof(struct pthread_data*) * THREAD_N);
 	for (int i = 0; i < THREAD_N; i++) {
 		p_data_arr[i] = malloc(sizeof(struct pthread_data));
+		p_data_arr[i]->in_fp = 0x0;
+		p_data_arr[i]->null_fp = fopen("/dev/null", "wb");
+		p_data_arr[i]->total_finded_n = 0;
 	}
 
 	char * ret_path = _range(program_path, input_path, err_msg, input_size, input_size-1);
 
 	for (int i = 0; i < THREAD_N; i++) {
+
+		fclose(p_data_arr[i]->null_fp);
 		free(p_data_arr[i]);
 	}
 	free(p_data_arr);
-	free(checked_begin_arr);
-	free(checked_rs_arr);
-
 	return ret_path;
 }
 
