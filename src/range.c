@@ -97,7 +97,7 @@ test_range (void *data) {
 char*
 _range (char * program_path, char * input_path, char * err_msg, long input_size, int rs) {
 
-	fprintf(stderr, "last minimized: %s, %d\n", input_path, input_size);
+	fprintf(stderr, "last minimized: %s, %ld\n", input_path, input_size);
 	int last_file_no = file_no;
 
 	pthread_t p_threads[THREAD_N];
