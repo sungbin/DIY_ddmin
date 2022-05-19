@@ -106,6 +106,7 @@ test_range (void *data) {
                                 f_cnt++;
 				sprintf(out_file, "./thread%d.part", (d->thread_idx + (THREAD_N*f_cnt)));
 				out_fp = fopen(out_file, "wb");
+				out_fd = fileno(out_fp);
 				finished = 1;
 			}
 		}
