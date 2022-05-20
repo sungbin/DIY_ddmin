@@ -41,13 +41,11 @@ test_range (void *data) {
 
 		pthread_mutex_lock(&begin_mt);
 		start = begin;
-		if (start > d->input_size - d->rs) {
-			pthread_mutex_unlock(&begin_mt);
-			break;
-		}
 		begin++;
 		pthread_mutex_unlock(&begin_mt);
-
+		if (start > d->input_size - d->rs) {
+			break;
+		}
 
 		init_cursor(d->in_fd, d->out_fd);
 		read_and_write(d->in_fp, d->out_fp, start); //prefix
