@@ -188,6 +188,9 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 char *
 range (char * program_path, char * input_path, char * err_msg) {
 
+	pthread_mutex_init(&begin_mt, NULL);
+	pthread_mutex_init(&find_mt, NULL);
+
 	fail_arr = malloc(sizeof(char*)*fail_max);
 	long input_size = byte_count_file(input_path);
 	p_data_arr = malloc(sizeof(struct pthread_data*) * THREAD_N);
@@ -205,6 +208,11 @@ range (char * program_path, char * input_path, char * err_msg) {
 		free(p_data_arr[i]);
 	}
 	free(p_data_arr);
+
+
+	pthread_mutex_destroy(&begin_mt);
+	pthread_mutex_destroy(&find_mt);
+
 	return ret_path;
 }
 
