@@ -21,6 +21,7 @@ main (int argc, char * argv[]) {
 	// argv[1] = target exe file
 	// argv[2] = crash input
 
+	srand(time(NULL));
 	if (argc < 4) {
 		printf("ERROR: input paprameters must be argv[0]: jsondump-path, argv[1]: crash-json-path, argv[2]: [ddmin, mymin], argv[3]: error-msg\n");
 		exit(1);
