@@ -1,7 +1,7 @@
-#define _GNU_SOURCE
 #define THREAD_N 8
 
 #include <unistd.h>
+#include <sys/time.h>
 #include <pthread.h>
 
 #include <stdio.h>
@@ -9,21 +9,38 @@
 #include <string.h>
 #include <time.h>
 
+#include "../../include/ddmin.h"
 
 int begin;
 int cur_rs;
 int ip_size;
 pthread_mutex_t begin_mt;
 
+char * program_path;
+char * input_path;
+char * err_msg;
+
+void test_json () {
+
+	int ret = test_buffer_overflow(program_path, input_path, err_msg);
+}
+
 void no_thread (int input_size, int rs) {
 
 	while (rs > 0) {
 
-		//fprintf(stderr, "rs=%d \n", rs);
+		fprintf(stderr, "rs=%d \n", rs);
 
 		for (int begin = 0; begin <= input_size - rs; begin++) {
 
-			usleep(1000);
+			struct timeval  tv;
+			gettimeofday(&tv, NULL);
+			double start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+			double end;
+			do {
+				gettimeofday(&tv, NULL);
+				end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;	
+			} while (end - start < 1);
 		}
 		rs--;
 	}
@@ -43,7 +60,15 @@ void * thread_func (void * data) {
 		if (start > ip_size - cur_rs) {
 			break;
 		}
-		usleep(1);
+		struct timeval  tv;
+		gettimeofday(&tv, NULL);
+		double start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+		double end;
+		do {
+			gettimeofday(&tv, NULL);
+			end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;	
+		} while (end - start < 1);
+
 
 	} while (start <= ip_size-cur_rs);
 
@@ -73,28 +98,52 @@ void thread (int input_size, int rs) {
 	}
 }
 
-int main () {
+int main (int argc, char * argv[]) {
 
+	fprintf(stderr, "program: %s, input: %s, err: %s \n", argv[1], argv[2], argv[3]);
 	pthread_mutex_init(&begin_mt, NULL);
 
+	program_path = argv[1];
+	input_path = argv[2];
+	err_msg = argv[3];
+
 	int start_input_size = 300;
-	int start_rs = 299;
+	int start_rs = start_input_size - 1;
 
-	time_t t = time(NULL);
-	clock_t start, end;
-	float res;
+	struct timeval  tv;
+	double start, end;
+	double res;
 
-	start = clock();
+	gettimeofday(&tv, NULL);
+	start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
 	no_thread(start_input_size, start_rs);
-	end = clock();
-	res = (float)(end - start)/CLOCKS_PER_SEC;
+	gettimeofday(&tv, NULL);
+	end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	res = (end - start)/1000;
 	fprintf(stderr, "no_thread(): %f \n", res);
 
-	start = clock();
+	gettimeofday(&tv, NULL);
+	start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
 	thread(start_input_size, start_rs);
-	end = clock();
-	res = (float)(end - start)/CLOCKS_PER_SEC;
+	gettimeofday(&tv, NULL);
+	end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	res = (end - start)/1000;
 	fprintf(stderr, "thread(): %f \n", res);
 
+	/*
+	gettimeofday(&tv, NULL);
+	start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	int ret;
+	for (int i = 0; i < 100; i++)
+		ret = test_buffer_overflow(argv[1], argv[2], argv[3]);
+	gettimeofday(&tv, NULL);
+	end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	res = (float)(end - start)/1000;
+	fprintf(stderr, "ret: %d \n", ret);
+	fprintf(stderr, "time: %f \n", res);
+
+	*/
 	pthread_mutex_destroy(&begin_mt);
+
+	return 0;
 }
