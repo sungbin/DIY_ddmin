@@ -1,13 +1,13 @@
-git clone https://github.com/google/fuzzer-test-suite.git
-mkdir libxml2
-cd libxml2
-../fuzzer-test-suite/libxml2-v2.9.2/build.sh
-cd ..
+#git clone https://github.com/google/fuzzer-test-suite.git
+#mkdir libxml2
+#cd libxml2
+#../fuzzer-test-suite/libxml2-v2.9.2/build.sh
+#cd ..
 
-mkdir sqlite
-cd sqlite
-../fuzzer-test-suite/sqlite-2016-11-14/build.sh
-cd ..
+#mkdir sqlite
+#cd sqlite
+#../fuzzer-test-suite/sqlite-2016-11-14/build.sh
+#cd ..
 
 #mkdir harfbuzz
 #cd harfbuzz
@@ -27,11 +27,10 @@ cd ..
 #mkdir vorbis
 #cd vorbis
 #../fuzzer-test-suite/vorbis-2017-12-11/build.sh
-#..
-
+#cd ..
 
 rm ./reduce
 cd source
 #gcc main_f-test-suite.c ddmin_f-test-suite.c range_f-test-suite.c runner_f-test-suite.c -g -o ../reduce -lm
-gcc ../../../src/main.c ../../../src/ddmin.c ../../../src/range_thread.c runner_f-test-suite.c -g -o ../reduce -lpthread  -lm
+gcc ../../../src/main.c ../../../src/ddmin.c ../../../src/range.c runner_f-test-suite.c -g -o ../reduce -lpthread  -lm -lpthread
 cd ..
