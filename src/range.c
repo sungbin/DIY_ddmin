@@ -25,17 +25,10 @@ extern int file_no;
 extern int fail_no;
 
 struct pthread_data ** p_data_arr;
-//int * checked_rs_arr = 0x0;
-//int * checked_begin_arr = 0x0;
 
 pthread_mutex_t begin_mt;
-pthread_mutex_t wait_mt;
-pthread_mutex_t rs_mt;
 
 int begin;
-//int finished;
-//int cur_rs;
-//int wait_cnt = 0;
 
 void * 
 test_range (void *data) {
@@ -54,7 +47,7 @@ test_range (void *data) {
 		}
 		begin++;
 		pthread_mutex_unlock(&begin_mt);
-		//fprintf(stderr, "lock (th=%d, rs=%d, begin=%d, out=%s) \n", d->thread_idx, d->rs, start, d->out_file);
+
 
 		init_cursor(d->in_fd, d->out_fd);
 		read_and_write(d->in_fp, d->out_fp, start); //prefix
@@ -87,7 +80,6 @@ test_range (void *data) {
 
 			return d->out_file;
 		}
-		//fprintf(stderr, "unlock (th=%d, rs=%d, begin=%d, out=%s) \n", d->thread_idx, d->rs, start, d->out_file);
 	} while (start <= d->input_size - d->rs);
 
 	return NULL;
@@ -101,8 +93,6 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 	int last_file_no = file_no;
 
 	pthread_t p_threads[THREAD_N];
-	
-	//fprintf(stderr, "_range program_path=%s, input_path=%s, input_size=%ld, rs=%d \n", program_path, input_path, input_size, rs);
 
 	for (int i = 0; i < THREAD_N; i++) {
 		struct pthread_data * p = p_data_arr[i];
@@ -111,10 +101,6 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 		p->input_size = input_size;
 		p->err_msg = err_msg;
 		p->thread_idx = i;
-
-		if (p->in_fp != 0x0) {
-			fclose(p->in_fp);
-		}
 		p->in_fp = fopen(input_path, "rb");
 		p->in_fd = fileno(p->in_fp);
 		char * out_file = malloc(sizeof(char) * 32);
@@ -124,6 +110,10 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 		p->out_fd = fileno(p->out_fp);
 
 	}
+
+	int fail_max = 4;
+	char ** fail_arr = malloc(sizeof(char*)*fail_max);
+	int fail_n = 0;
 
 	for (int cur_rs = rs; cur_rs > 0; cur_rs--) {
 
@@ -138,13 +128,9 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 			}
 		}
 
-		char * fail_arr[2048];
-		int fail_n = 0;
 		int is_terminated_th_arr[THREAD_N] = { 0 };
 		void * retval;
 
-
-		
 		do {
 			for (int i = 0; i < THREAD_N; i++) {
 				if (is_terminated_th_arr[i]) {
@@ -157,6 +143,14 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 				if (retval != NULL) {
 
 					char * fail_path = (char*) retval;
+					int over = 0;
+					while (fail_n >= fail_max) {
+						fail_max *= 2;
+						over = 1;
+					}
+					if (over) {
+						fail_arr = realloc(fail_arr, sizeof(char*)*fail_max);
+					}
 					fail_arr[fail_n++] = fail_path;
 
 					fclose(p_data_arr[i]->out_fp);
@@ -190,6 +184,14 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 				if (retval != NULL) {
 
 					char * fail_path = (char*) retval;
+					int over = 0;
+					while (fail_n >= fail_max) {
+						fail_max *= 2;
+						over = 1;
+					}
+					if (over) {
+						fail_arr = realloc(fail_arr, sizeof(char*)*fail_max);
+					}
 					fail_arr[fail_n++] = fail_path;
 
 					fclose(p_data_arr[i]->out_fp);
@@ -214,11 +216,17 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 					free(fail_arr[i]);
 				}
 			}
+			free(fail_arr);
 	
+			for (int i = 0; i < THREAD_N; i++) {
+				fclose(p_data_arr[i]->in_fp);
+			}
+
 			finded_path = _range(program_path, finded_path, err_msg, (input_size-cur_rs), MIN(cur_rs, (input_size-cur_rs-1)));
 			return finded_path;
 		}
 	}
+	free(fail_arr);
 	return input_path;
 }
 
@@ -229,7 +237,6 @@ range (char * program_path, char * input_path, char * err_msg) {
 	p_data_arr = malloc(sizeof(struct pthread_data*) * THREAD_N);
 	for (int i = 0; i < THREAD_N; i++) {
 		p_data_arr[i] = malloc(sizeof(struct pthread_data));
-		p_data_arr[i]->in_fp = 0x0;
 		p_data_arr[i]->null_fp = fopen("/dev/null", "wb");
 		p_data_arr[i]->total_finded_n = 0;
 	}
