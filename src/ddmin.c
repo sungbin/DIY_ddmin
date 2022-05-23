@@ -275,6 +275,50 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 
 }
 
+int
+test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * err_msg, int out_idx) {
+	
+	char stdout_path[256];
+	char stderr_path[256];
+
+	sprintf(stdout_path, "./dummy%d.stdout", out_idx);
+	sprintf(stderr_path, "./dummy%d.stderr", out_idx);
+
+	FILE * t_fp = fopen(stderr_path, "wb");
+	if (t_fp == 0x0) {
+                fprintf(stderr, "no: %s \n", stderr_path);
+                perror("test_buffer_overflow()");
+                exit(1);
+        }
+	fclose(t_fp);
+	runner_error_code error_code = runner(program_path, input_seq_path, stdout_path, stderr_path);
+
+        FILE * fp = fopen(stderr_path, "rb");
+	if (fp == 0x0) {
+		fprintf(stderr, "no: %s \n", stderr_path);
+		perror("test_buffer_overflow()");
+		exit(1);
+	}
+
+        char line[512];
+        while (fgets(line, 512, fp) != 0x0) {
+                if (strstr(line, err_msg) != 0x0) {
+                        fclose(fp);
+                        remove(stdout_path);
+                        remove(stderr_path);
+                        return 1;
+                }
+        }
+
+        fclose(fp);
+
+        remove(stdout_path);
+        remove(stderr_path);
+
+        return 0;
+
+}
+
 char *
 ddmin_dir (char * program_path, char * input_dir, char * err_msg, char * exe_dir) {
 

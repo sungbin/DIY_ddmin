@@ -8,7 +8,7 @@ struct pthread_data {
         char * err_msg;
 	int thread_idx;
 
-	int total_finded_n;
+	int finded_n;
 	char * out_file;
 	FILE * in_fp;
 	FILE * out_fp;

@@ -14,4 +14,4 @@ int
 copy (const char *src, const char *dst);
 
 int
-test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * err_msg, int thread_idx);
+test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * err_msg, int out_idx);
