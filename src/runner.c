@@ -3,25 +3,38 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <errno.h>
 
 #include "../include/runner.h"
 
 runner_error_code
 get_error (enum E_Type type, int exit_code);
 
+pid_t c_pid;
+
+void
+kill_child(int sig) {
+
+	kill(c_pid, SIGKILL);
+}
+
 runner_error_code
 runner (char* target_path, char* input_path, char *output_path, char *output_err_path)
 {
-	pid_t pid = fork();
-        if (pid < 0) { 
+
+	signal(SIGALRM, kill_child);
+
+	c_pid = fork();
+        if (c_pid < 0) { 
 		runner_error_code error_code = get_error(E_FORK, 0);
                 return error_code;
         }
 
         /* Child process */
-        if (pid == 0) { 
+        if (c_pid == 0) { 
 
 		//putenv("ASAN_OPTIONS=detect_leaks=0:halt_on_error=1");
 
@@ -34,28 +47,18 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
                 dup2(out_err_fd, STDERR_FILENO);
                 
 		execl(target_path, target_path, NULL);
-                _exit(1);
+		perror("execl():");
         }
         
         /* Parent process */
-        int status = 0;
-        int start, end;
-        start = ((int)clock()) / CLOCKS_PER_SEC;
-        end = ((int)clock()) / CLOCKS_PER_SEC;
-
-        while ((end - start) < 3) {
-		int w = waitpid(pid, &status, WNOHANG);
-		if (w != 0) {
-			break;
-		}
-                end = ((int)clock()) / CLOCKS_PER_SEC;
-	}
+	alarm(3);
+	int status;
+	int start = ((int) clock()) / CLOCKS_PER_SEC;
+	waitpid(c_pid, &status, 0);
+	int end = ((int) clock()) / CLOCKS_PER_SEC;
 
 	int exit_stated = WEXITSTATUS(status);
 	if ((end - start) >= 3) {
-		// Time out Kill
-		kill(pid, SIGKILL);
-		wait(&status);
 		runner_error_code error_code = get_error(E_TIMEOUT_KILL, exit_stated);
 		return error_code;
 	}
