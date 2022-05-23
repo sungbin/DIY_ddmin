@@ -52,6 +52,15 @@ init_cursor(int in_fd, int out_fd) {
 }
 
 void
+init_cursor_thread(int out_fd) {
+
+        if (lseek(out_fd, 0, SEEK_SET) == -1) {
+                perror("lseek(out_fd)");
+                exit(1);
+        }
+}
+
+void
 read_and_write(FILE * in_fp, FILE * out_fp, int n) {
 
         while (n > 0) {
@@ -89,17 +98,24 @@ void cut_range_thread (int begin, int rs, int input_size, FILE * in_fp, FILE * o
 	}
 
 	*/
+	init_cursor_thread(out_fd);
+
 	char buf[2048];
 	int buf_size = 0;
+	int w_size = 0;
 
 	if (input_size < 2048) {
 		buf_size = pread(in_fd, buf, begin, 0);
-		pwrite(out_fd, buf, buf_size, 0);
-		buf_size = pread(in_fd, buf, (input_size-(begin+rs)), (begin+rs+1));
-		pwrite(out_fd, buf, buf_size, (begin+1));
+		fwrite(buf, 1, buf_size, out_fp);
+
+		buf_size = pread(in_fd, buf, (input_size-(begin+rs)), (begin+rs));
+		fwrite((buf+begin), 1, buf_size, out_fp);
 	}
 
-	/*
+	if (fflush(out_fp) == -1) {
+		perror("ERROR: flush");
+		exit(1);
+	}
 	int bt;
 	if ((bt = byte_count_file(out_file)) > (input_size - rs)) {
 		if (truncate(out_file, input_size - rs) == -1) {
@@ -111,6 +127,7 @@ void cut_range_thread (int begin, int rs, int input_size, FILE * in_fp, FILE * o
                 fprintf(stderr, "ERROR: few written. bt:%d, correct: %d \n", bt, (input_size - rs));
                 exit(1);
         }
+	/*
 	*/
 
 }
@@ -132,7 +149,6 @@ void cut_range (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, 
 		perror("ERROR: flush");
 		exit(1);
 	}
-	/*
 	int bt;
 	if ((bt = byte_count_file(out_file)) > (input_size - rs)) {
 		if (truncate(out_file, input_size - rs) == -1) {
@@ -144,6 +160,7 @@ void cut_range (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, 
 		fprintf(stderr, "ERROR: few written. bt:%d, correct: %d \n", bt, (input_size - rs));
 		exit(1);
 	}
+	/*
 	*/
 }
 
@@ -243,7 +260,7 @@ int main (int argc, char * argv[]) {
 	err_msg = argv[3];
 
 	int start_input_size = 378;
-	int start_rs = start_input_size - 100;
+	int start_rs = start_input_size - 1;
 
 	struct timeval  tv;
 	double start, end;
