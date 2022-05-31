@@ -249,6 +249,10 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 	fclose(t_fp);
 	runner_error_code error_code = runner(program_path, input_seq_path, stdout_path, stderr_path);
 
+	if (error_code.type == E_TIMEOUT_KILL) {
+		return 0;
+	}
+
         FILE * fp = fopen(stderr_path, "rb");
 	if (fp == 0x0) {
 		fprintf(stderr, "no: %s \n", stderr_path);
@@ -293,6 +297,10 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
 	fclose(t_fp);
 	runner_error_code error_code = runner(program_path, input_seq_path, stdout_path, stderr_path);
 
+	if (error_code.type == E_TIMEOUT_KILL) {
+		return 0;
+	}
+
         FILE * fp = fopen(stderr_path, "rb");
 	if (fp == 0x0) {
 		fprintf(stderr, "no: %s \n", stderr_path);
@@ -303,6 +311,7 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
         char line[512];
         while (fgets(line, 512, fp) != 0x0) {
                 if (strstr(line, err_msg) != 0x0) {
+			//fprintf(stderr, "find! %s \n", input_seq_path);
                         fclose(fp);
                         remove(stdout_path);
                         remove(stderr_path);

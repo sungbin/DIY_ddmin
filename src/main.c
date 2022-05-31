@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +29,13 @@ main (int argc, char * argv[]) {
 		exit(1);
 	}
 
+	struct timeval  tv;
+	double start, end;
+	double res;
+
+	gettimeofday(&tv, NULL);
+	start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
+
 	time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         fprintf(stderr, "START:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
@@ -51,6 +60,11 @@ main (int argc, char * argv[]) {
 	t = time(NULL);
         tm = *localtime(&t);
         fprintf(stderr, "END:  %d-%d-%d %d:%d:%d\n", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+	gettimeofday(&tv, NULL);
+	end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
+	res = (end - start)/1000;
+	fprintf(stderr, "thread(%d): %f \n", THREAD_N, res);	
 
 	if (result != argv[2]) {
 		free(result);

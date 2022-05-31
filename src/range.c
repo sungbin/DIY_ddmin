@@ -44,9 +44,6 @@ test_range (void *data) {
 
 	do {
 
-		if (begin > d->input_size - d->rs) {
-			break;
-		}
 		pthread_mutex_lock(&begin_mt);
 		start = begin;
 		begin++;
@@ -77,7 +74,7 @@ test_range (void *data) {
 			exit(1);
 		}
 
-		int e_code = test_buffer_overflow(d->program_path, d->out_file, d->err_msg);
+		int e_code = test_buffer_overflow_thread(d->program_path, d->out_file, d->err_msg, (d->thread_idx+THREAD_N*d->finded_n));
 		if (file_no % 1000 == 0) {
 			time_t t = time(NULL);
 			struct tm tm = *localtime(&t);

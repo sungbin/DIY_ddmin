@@ -51,8 +51,8 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         }
         
         /* Parent process */
-	alarm(3);
 	int status;
+	alarm(3);
 	int start = ((int) clock()) / CLOCKS_PER_SEC;
 	waitpid(c_pid, &status, 0);
 	int end = ((int) clock()) / CLOCKS_PER_SEC;
