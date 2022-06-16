@@ -41,7 +41,12 @@ sem_t x_sem;
 pthread_mutex_t start_mt;
 pthread_mutex_t end_mt;
 
-pthread_cond_t cond;
+FILE * null_fp;
+FILE * in_fps[THREAD_N];
+int in_fds[THREAD_N];
+char * out_files[THREAD_N];
+FILE * out_fps[THREAD_N];
+int out_fds[THREAD_N];
 
 
 //int begin;
@@ -61,16 +66,21 @@ test_range (void *data) {
 
 	while (1) {
 
+		// pop
 		sem_wait(&q_sem);
 		pthread_mutex_lock(&start_mt);
 		struct node * n = pop_queue(q);
 		pthread_mutex_unlock(&start_mt);
 		
+		//TODO: logic of range
+
+		//fprintf(stderr, "\t %d ", n->begin);
+
+		// closing
 		pthread_mutex_lock(&end_mt);
 		existing--;
-		if (existing == 0 && q->count == 0) {
-			fprintf(stderr, "signal (size=%d, rs=%d, begin=%d) \n", q->count, cur_rs, n->begin);
-			sem_post(&x_sem);
+		if (existing == 0) {
+			sem_post(&x_sem); // end signal
 		}
 		pthread_mutex_unlock(&end_mt);
 		free(n);
@@ -86,60 +96,25 @@ _range (char * program_path, char * input_path, char * err_msg, long input_size,
 
 	fprintf(stderr, "last minimized: %s, %ld\n", input_path, input_size);
 
-
-	fail_n = 0;
-
 	for (int _rs = rs; _rs > 0; _rs--) {
-	//for (int _rs = rs; _rs > 370; _rs--) {
 
+		fail_n = 0;
 		cur_rs = _rs;
 		existing = input_size - _rs + 1;
 
 		// fille queue
 		for (int begin = 0 ; begin <= input_size - _rs; begin++) {
-			//fprintf(stderr, "push (rs=%d, b=%d) \n", _rs, begin);
 			pthread_mutex_lock(&start_mt);
+
 			push_queue(q, rs, begin);
 			pthread_mutex_unlock(&start_mt);
 			sem_post(&q_sem);
 		}
 
-
-		fprintf(stderr, "wait (size=%d, rs=%d) \n", q->count, cur_rs);
+		// wait signal
 		sem_wait(&x_sem);
-		/*
-		pthread_mutex_lock(&end_mt);
-		while (q->count > 0) {
-			fprintf(stderr, "wait (size=%d, rs=%d) \n", q->count, cur_rs);
-			pthread_cond_wait(&cond, &end_mt);
-		}
-		pthread_mutex_unlock(&end_mt);
-		*/
+		//fprintf(stderr, "@ end: %d \n", _rs);
 
-		// TODO: while num_sem(&q_sem) != 0 {}
-
-		/*
-		if (fail_n > 0) {
-
-			//char ** fail_arr;
-			//int fail_n = 0;
-			int select_idx = rand() % fail_n;
-			printf("select %d in [0, %d) \n", select_idx, fail_n);
-			char * fail_path = fail_arr[select_idx];
-			for (int i = 0; i < fail_n; i++) {
-				if (i != select_idx) {
-					free(fail_arr[i]);
-				}
-			}
-			for (int i = 0; i < THREAD_N; i++) {
-				fclose(p_data_arr[i]->in_fp);
-				fclose(p_data_arr[i]->out_fp);
-			}
-
-			return _range(program_path, fail_path, err_msg, (input_size-cur_rs), MIN(cur_rs, (input_size-cur_rs-1)));
-
-		}
-		*/
 	}
 
 	/*
@@ -158,7 +133,6 @@ range (char * program_path, char * input_path, char * err_msg) {
 	sem_init(&x_sem, 0, 0);
 	pthread_mutex_init(&start_mt, NULL);
 	pthread_mutex_init(&end_mt, NULL);
-	pthread_cond_init(&cond, NULL);
 
 	fail_arr = malloc(sizeof(char*)*fail_max);
 	long input_size = byte_count_file(input_path);
@@ -190,7 +164,6 @@ range (char * program_path, char * input_path, char * err_msg) {
 	sem_destroy(&q_sem);
 	pthread_mutex_destroy(&start_mt);
 	pthread_mutex_destroy(&end_mt);
-	pthread_cond_destroy(&cond);
 
 	for (int i = 0; i < THREAD_N; i++) {
 
