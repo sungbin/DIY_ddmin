@@ -1,4 +1,4 @@
-#define THREAD_N 8
+#define THREAD_N 12
 
 struct pthread_data {
 	/*global*/
@@ -8,17 +8,17 @@ struct pthread_data {
 	long input_size;
         char * err_msg;
 	int finded_n;
-	*/
-
-
-	/*thread input*/
-	int thread_idx;
+	
 	char * out_file;
 	FILE * in_fp;
 	FILE * out_fp;
 	FILE * null_fp;
 	int in_fd;
 	int out_fd;
+	*/
+
+	/*thread input*/
+	int thread_idx;
 
 	/*queue*/
 	/*
@@ -51,14 +51,11 @@ test_range (void *data);
 int
 run_threads (char ** ret_list, void *test_range_func, int rs, char * program_path, char * mmap_addr, long f_size, char * err_msg);
 
-int
-range_thread (char ** ret_list, char * program_path, char * input_path, int rs, char * err_msg);
+char*
+_range (char * _input_path, long _input_size, int _rs);
 
 char*
-_range (char * program_path, char * input_path, char * err_msg, long input_size, int rs);
-
-char*
-range (char * program_path, char * input_path, char * err_msg);
+range (char * _program_path, char * _input_path, char * _err_msg);
 
 char *
 range_dir (char * program_path, char * input_dir, char * input_name, int rs, char * err_msg, char * exe_dir);

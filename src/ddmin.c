@@ -282,6 +282,8 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 int
 test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * err_msg, int out_idx) {
 	
+	//fprintf(stderr, "start test: %s, %s, %s, %d \n", program_path,input_seq_path,err_msg,out_idx);
+
 	char stdout_path[256];
 	char stderr_path[256];
 
@@ -297,7 +299,11 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
 	fclose(t_fp);
 	runner_error_code error_code = runner(program_path, input_seq_path, stdout_path, stderr_path);
 
+
 	if (error_code.type == E_TIMEOUT_KILL) {
+		//fprintf(stderr, "return 1 \n");
+		remove(stdout_path);
+		remove(stderr_path);
 		return 0;
 	}
 
@@ -315,6 +321,7 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
                         fclose(fp);
                         remove(stdout_path);
                         remove(stderr_path);
+			//fprintf(stderr, "return 2 \n");
                         return 1;
                 }
         }
@@ -324,6 +331,7 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
         remove(stdout_path);
         remove(stderr_path);
 
+	//fprintf(stderr, "return 3 \n");
         return 0;
 
 }
