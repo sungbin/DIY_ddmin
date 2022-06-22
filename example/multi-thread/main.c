@@ -1,6 +1,7 @@
-#define THREAD_N 8
+#define THREAD_N 4
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -13,10 +14,15 @@
 
 #include "../../include/ddmin.h"
 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 int begin;
 int cur_rs;
 int ip_size;
+
 pthread_mutex_t begin_mt;
+pthread_mutex_t find_mt;
 
 char * program_path;
 char * input_path;
@@ -38,6 +44,11 @@ int in_fd;
 
 int out_fds[THREAD_N+1];
 
+char ** fail_arr;
+int fail_max = 256;
+int total_fail_n = 0;
+int fail_n = 0;
+
 void
 init_cursor(int in_fd, int out_fd) {
 
@@ -45,15 +56,6 @@ init_cursor(int in_fd, int out_fd) {
                 perror("lseek(in_fd)");
                 exit(1);
         }
-        if (lseek(out_fd, 0, SEEK_SET) == -1) {
-                perror("lseek(out_fd)");
-                exit(1);
-        }
-}
-
-void
-init_cursor_thread(int out_fd) {
-
         if (lseek(out_fd, 0, SEEK_SET) == -1) {
                 perror("lseek(out_fd)");
                 exit(1);
@@ -85,16 +87,10 @@ read_and_write(FILE * in_fp, FILE * out_fp, int n) {
 
 }
 
-void cut_range (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, int in_fd, int out_fd, char * out_file) {
+void run_runner (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, int in_fd, int out_fd, char * out_file, int th_idx) {
 
-	//fprintf(stderr, "begin=%d, rs=%d, size=%d, file=%s \n", begin, rs, input_size, out_file);
 
-	/*
-	int j;
-	for (int i = 0; i < 2000; i++) {
-		j+=i;
-	}
-	*/
+
 	init_cursor(in_fd, out_fd);
 	read_and_write(in_fp, out_fp, begin); //prefix
 	read_and_write(in_fp, null_fp, rs); //rs
@@ -116,6 +112,33 @@ void cut_range (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, 
 	}
 	/*
 	*/
+
+	int e_code = test_buffer_overflow_thread(program_path, out_file, err_msg, th_idx);
+	//int e_code = test_buffer_overflow_thread(program_path, input_path, err_msg, th_idx);
+
+	if (e_code == 1) {
+
+		fprintf(stderr, "find! rs=%d, begin=%d, th_idx=%d path=%s \n", rs, begin, th_idx, out_file);
+
+		pthread_mutex_lock(&find_mt);
+		int fail_idx = fail_n;
+		fail_n++;
+		pthread_mutex_unlock(&find_mt);
+		fail_arr[fail_idx] = out_file;
+
+		fclose(out_fps[th_idx]);
+		//fclose(d->out_fp);
+		out_file = malloc(sizeof(char) * 32);
+		out_files[th_idx] = out_file;
+		fail_n++;
+		sprintf(out_files[th_idx], "./thread%d", (th_idx+THREAD_N*fail_n));
+		out_fps[th_idx] = fopen(out_file, "wb");
+		out_fds[th_idx] = fileno(out_fps[th_idx]);
+	}
+	/*
+	*/
+
+	
 }
 
 void test_json () {
@@ -130,19 +153,44 @@ void test_json_th (int out_idx) {
 void no_thread (int input_size, int rs) {
 
 	while (rs > 0) {
+
+		fprintf(stderr, "rs=%d \n", rs);
+
 		ip_size = input_size;
 
-
+		char p_data_arr[256][256];
+		int cnt = 0;
+		fail_n = 0;
 		for (int begin = 0; begin <= input_size - rs; begin++) {
-
-			//test_json();
-			cut_range(begin, rs, ip_size, in_fp, out_fps[0], in_fd, out_fds[0], out_files[0]);
-			cut_range(begin, rs, ip_size, in_fp, out_fps[0], in_fd, out_fds[0], out_files[0]);
-			cut_range(begin, rs, ip_size, in_fp, out_fps[0], in_fd, out_fds[0], out_files[0]);
-			cut_range(begin, rs, ip_size, in_fp, out_fps[0], in_fd, out_fds[0], out_files[0]);
-			cut_range(begin, rs, ip_size, in_fp, out_fps[0], in_fd, out_fds[0], out_files[0]);
-			
+			run_runner(begin, rs, ip_size, in_fps[0], out_fps[0], in_fds[0], out_fds[0], out_files[0], 0);
 		}
+
+// (int begin, int rs, int input_size, FILE * in_fp, FILE * out_fp, int in_fd, int out_fd, char * out_file, int th_idx)
+
+		if (fail_n > 0) {
+
+			int select_idx = rand() % fail_n;
+			printf("select %d in [0, %d) \n", select_idx, fail_n);
+			char * fail_path = fail_arr[select_idx];
+			for (int i = 0; i < fail_n; i++) {
+				if (i == select_idx) {
+					continue;
+				}
+				free(fail_arr[i]);
+			}
+
+			for (int i = 0; i < THREAD_N+1; i++) {
+				fclose(in_fps[i]);
+				fclose(out_fps[i]);
+
+				in_fps[i] = fopen(fail_path, "rb");
+				in_fds[i] = fileno(in_fps[i]);
+			}
+			input_path = fail_path;
+			no_thread((input_size-rs), MIN(rs, (ip_size - rs - 1)));
+		}
+		
+
 		rs--;
 	}
 	
@@ -155,8 +203,6 @@ void * thread_func (void * data) {
 
 
 	do {
-
-
 		pthread_mutex_lock(&begin_mt);
 		start = begin;
 		begin++;
@@ -164,15 +210,7 @@ void * thread_func (void * data) {
 		if (start > ip_size - cur_rs) {
 			break;
 		}
-		//fprintf(stderr, "start=%d, rs=%d, size=%d \n", start, cur_rs, ip_size);
-		//fprintf(stderr, "begin=%d, rs=%d, th=%d \n", start, cur_rs, th_idx);
-		//test_json_th(th_idx);
-		cut_range(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx]);
-		cut_range(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx]);
-		cut_range(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx]);
-		cut_range(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx]);
-		cut_range(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx]);
-		//fprintf(stderr, "!! begin=%d, rs=%d, th=%d \n", start, cur_rs, th_idx);
+		run_runner(start, cur_rs, ip_size, in_fps[th_idx], out_fps[th_idx], in_fds[th_idx], out_fds[th_idx], out_files[th_idx], th_idx);
 
 	} while (start <= ip_size-cur_rs);
 
@@ -186,8 +224,9 @@ void thread (int input_size, int rs) {
 
 	while (rs > 0) {
 
-		//fprintf(stderr, "rs=%d \n", rs);
+		fprintf(stderr, "rs=%d \n", rs);
 
+		fail_n = 0;
 		begin = 0;
 		cur_rs = rs;
 		ip_size = input_size;
@@ -200,6 +239,40 @@ void thread (int input_size, int rs) {
 			pthread_join(p_threads[i], NULL);
 		}
 
+		if (fail_n > 0) {
+
+			int select_idx = rand() % fail_n;
+                        printf("select %d in [0, %d) \n", select_idx, fail_n);
+                        char * fail_path = fail_arr[select_idx];
+
+			total_fail_n++;
+			char * ret_path = malloc(sizeof(char)*16);
+			sprintf(ret_path, "./fail%d.part", total_fail_n);
+			rename(fail_path, ret_path);
+			input_path = ret_path;
+
+
+                        for (int i = 0; i < fail_n; i++) {
+				free(fail_arr[i]);
+                        }
+
+                        for (int i = 0; i < THREAD_N; i++) {
+				fclose(in_fps[i]);
+				fclose(out_fps[i]);
+
+				sprintf(out_files[i], "thread%d",i);
+				in_fps[i] = fopen(input_path, "rb");
+				out_fps[i] = fopen(out_files[i], "wb");
+				in_fds[i] = fileno(in_fps[i]);
+				out_fds[i] = fileno(out_fps[i]);
+                        }
+
+			input_size = input_size - cur_rs;
+			rs = MIN(cur_rs, input_size - 1);
+			input_path = ret_path;
+		}	
+
+
 		rs--;
 	}
 }
@@ -209,16 +282,21 @@ int main (int argc, char * argv[]) {
 	fprintf(stderr, "program: %s, input: %s, err: %s \n", argv[1], argv[2], argv[3]);
 	pthread_mutex_init(&begin_mt, NULL);
 
+
 	program_path = argv[1];
-	input_path = argv[2];
+	input_path = strdup(argv[2]);
 	err_msg = argv[3];
 
 	int start_input_size = 378;
 	int start_rs = start_input_size - 1;
+	//int start_rs = 1;
+
 
 	struct timeval  tv;
 	double start, end;
 	double res;
+
+	fail_arr = malloc(sizeof(char*)*fail_max);
 
 	for (int i = 0; i < THREAD_N+1; i++) {
 		out_files[i] = malloc(sizeof(32));
@@ -234,6 +312,7 @@ int main (int argc, char * argv[]) {
 	in_fd = fileno(in_fp);
 	//tin_fd = fileno(tin_fp);
 
+	/*
 	gettimeofday(&tv, NULL);
 	start = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
 	no_thread(start_input_size, start_rs);
@@ -241,7 +320,6 @@ int main (int argc, char * argv[]) {
 	end = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
 	res = (end - start)/1000;
 	fprintf(stderr, "no_thread(): %f \n", res);
-	/*
 	*/
 
 	gettimeofday(&tv, NULL);

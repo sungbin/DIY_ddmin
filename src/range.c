@@ -37,7 +37,7 @@ struct queue_t * q;
 struct pthread_data ** p_data_arr;
 
 sem_t q_sem;
-sem_t x_sem;
+sem_t terminated_sem;
 pthread_mutex_t start_mt;
 pthread_mutex_t end_mt;
 pthread_mutex_t find_mt;
@@ -138,8 +138,8 @@ test_range (void *data) {
 		existing--;
 		//fprintf(stderr, "existing: %d \n", existing);
 		if (existing == 0) {
-			//fprintf(stderr, "push (x_sem) \n");
-			sem_post(&x_sem); // end signal
+			//fprintf(stderr, "push (terminated_sem) \n");
+			sem_post(&terminated_sem); // end signal
 		}
 		pthread_mutex_unlock(&end_mt);
 		free(n);
@@ -184,7 +184,7 @@ _range (char * _input_path, long _input_size, int _rs) {
 		}
 
 		// wait signal
-		sem_wait(&x_sem);
+		sem_wait(&terminated_sem);
 
 		if (fail_n > 0) {
 
@@ -234,7 +234,7 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 	err_msg = _err_msg;
 
 	sem_init(&q_sem, 0, 0);
-	sem_init(&x_sem, 0, 0);
+	sem_init(&terminated_sem, 0, 0);
 	pthread_mutex_init(&start_mt, NULL);
 	pthread_mutex_init(&end_mt, NULL);
 	pthread_mutex_init(&find_mt, NULL);
@@ -265,7 +265,7 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 
 
 	sem_destroy(&q_sem);
-	sem_destroy(&x_sem);
+	sem_destroy(&terminated_sem);
 	pthread_mutex_destroy(&start_mt);
 	pthread_mutex_destroy(&end_mt);
 	pthread_mutex_destroy(&find_mt);

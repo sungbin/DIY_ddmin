@@ -11,6 +11,14 @@
 runner_error_code
 get_error (enum E_Type type, int exit_code);
 
+
+pid_t c_pid;
+void
+kill_child(int sig) {
+
+        kill(c_pid, SIGKILL);
+}
+
 runner_error_code
 runner (char* target_path, char* input_path, char *output_path, char *output_err_path)
 {
@@ -34,18 +42,11 @@ runner (char* target_path, char* input_path, char *output_path, char *output_err
         }
         
         /* Parent process */
-        int status = 0;
-        int start, end;
-        start = ((int)clock()) / CLOCKS_PER_SEC;
-        end = ((int)clock()) / CLOCKS_PER_SEC;
-
-        while ((end - start) < 1) {
-		int w = waitpid(pid, &status, WNOHANG);
-		if (w != 0) {
-			break;
-		}
-                end = ((int)clock()) / CLOCKS_PER_SEC;
-	}
+	alarm(3);
+        int status;
+        int start = ((int) clock()) / CLOCKS_PER_SEC;
+        waitpid(c_pid, &status, 0);
+        int end = ((int) clock()) / CLOCKS_PER_SEC;
 
 	int exit_stated = WEXITSTATUS(status);
 	if ((end - start) >= 1) {
