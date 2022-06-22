@@ -215,11 +215,13 @@ _range (char * _input_path, long _input_size, int _rs) {
 			return _range(fail_path, (input_size-rs), MIN(rs, (input_size-rs-1)));
 
 		}
-
+		else {
+		}
 	}
 
+
 	for (int i = 0; i < THREAD_N; i++) {
-		fclose(in_fds[i]);
+		fclose(in_fps[i]);
 	}
 
 	return input_path;
@@ -261,6 +263,7 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 
 	char * ret_path = _range(_input_path, input_size, input_size-1);
 
+
 	sem_destroy(&q_sem);
 	sem_destroy(&x_sem);
 	pthread_mutex_destroy(&start_mt);
@@ -273,6 +276,7 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 	}
 	fclose(null_fp);
 	free(fail_arr);
+
 
 
 	return ret_path;
