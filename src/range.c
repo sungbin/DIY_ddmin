@@ -215,8 +215,6 @@ _range (char * _input_path, long _input_size, int _rs) {
 			return _range(fail_path, (input_size-rs), MIN(rs, (input_size-rs-1)));
 
 		}
-		else {
-		}
 	}
 
 
