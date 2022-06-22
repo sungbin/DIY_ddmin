@@ -174,7 +174,7 @@ _range (char * _input_path, long _input_size, int _rs) {
 		rs = r_size;
 		existing = input_size - r_size + 1;
 
-		// fille queue
+		// file queue
 		for (int begin = 0 ; begin <= input_size - r_size; begin++) {
 			pthread_mutex_lock(&start_mt);
 
@@ -214,8 +214,6 @@ _range (char * _input_path, long _input_size, int _rs) {
 			fprintf(stderr, "last minimized: %s, %d\n", fail_path, input_size-rs);
 			return _range(fail_path, (input_size-rs), MIN(rs, (input_size-rs-1)));
 
-		}
-		else {
 		}
 	}
 
