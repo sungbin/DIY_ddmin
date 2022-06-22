@@ -42,13 +42,7 @@ pthread_mutex_t start_mt;
 pthread_mutex_t end_mt;
 pthread_mutex_t find_mt;
 
-FILE * null_fp;
-FILE * in_fps[THREAD_N];
-int in_fds[THREAD_N];
 char * out_files[THREAD_N];
-FILE * out_fps[THREAD_N];
-int out_fds[THREAD_N];
-
 
 //int begin;
 int fail_stack[THREAD_N];
@@ -61,7 +55,8 @@ int fail_n = 0;
 int existing;
 
 int rs;
-char * input_path;
+//char * input_path;
+char ** input_path_arr;
 int input_size;
 char * program_path;
 char * err_msg;
@@ -69,7 +64,7 @@ char * err_msg;
 void * 
 test_range (void *data) {
 	
-	int th_idx = (int) data;
+	int th_idx = ((struct pthread_data*) data)->thread_idx;
 
 	while (1) {
 
@@ -79,13 +74,19 @@ test_range (void *data) {
 		struct node * n = pop_queue(q);
 		pthread_mutex_unlock(&start_mt);
 		
-		// logic of range
+		// input_setting
+		char * input_path = input_path_arr[th_idx];
+		FILE * in_fp = fopen(input_path, "rb");
+		FILE * null_fp = fopen("/dev/null", "wb");
+		int in_fd = fileno(in_fp);
+		FILE * out_fp = fopen(out_files[th_idx], "wb");
+		int out_fd = fileno(out_fp);
 
-		init_cursor(in_fds[th_idx], out_fds[th_idx]);
-		read_and_write(in_fps[th_idx], out_fps[th_idx], n->begin); //prefix
-		read_and_write(in_fps[th_idx], null_fp, rs); //rs
-		read_and_write(in_fps[th_idx], out_fps[th_idx], input_size - (n->begin + rs)); //postfix
-		if (fflush(out_fps[th_idx]) == -1) {
+		// logic of range
+		read_and_write(in_fp, out_fp, n->begin); //prefix
+		read_and_write(in_fp, null_fp, rs); //rs
+		read_and_write(in_fp, out_fp, input_size - (n->begin + rs)); //postfix
+		if (fflush(out_fp) == -1) {
 			perror("ERROR: flush");
 			exit(1);
 		}
@@ -122,16 +123,16 @@ test_range (void *data) {
 			}
 
 			fail_arr[fail_idx] = out_files[th_idx];
-			fclose(out_fps[th_idx]);
 			
 			out_files[th_idx] = malloc(sizeof(char) * 32);
 			fail_stack[th_idx]++;
 			sprintf(out_files[th_idx], "./thread%d.part", th_idx + THREAD_N*fail_stack[th_idx]);
 
-			out_fps[th_idx] = fopen(out_files[th_idx], "wb");
-			out_fds[th_idx] = fileno(out_fps[th_idx]);
 		}
 
+		fclose(in_fp);
+		fclose(out_fp);
+		fclose(null_fp);
 
 		// closing
 		pthread_mutex_lock(&end_mt);
@@ -155,24 +156,20 @@ _range (char * _input_path, long _input_size, int _rs) {
 
 
 	// input settings
-	input_path = _input_path;
 	input_size = _input_size;
 	
 	for (int i = 0; i < THREAD_N; i++) {
 
-                in_fps[i] = fopen(_input_path, "rb");
-		if (in_fps[i] == NULL) {
-			fprintf(stderr, "ERROR: fopen(input) \n");
-				exit(1);
-		}
-                in_fds[i] = fileno(in_fps[i]);
+		copy(_input_path, input_path_arr[i]);
         }
 
+	// main logic
 	for (int r_size = _rs; r_size > 0; r_size--) {
 
 		fail_n = 0;
 		rs = r_size;
 		existing = input_size - r_size + 1;
+
 
 		// file queue
 		for (int begin = 0 ; begin <= input_size - r_size; begin++) {
@@ -182,7 +179,7 @@ _range (char * _input_path, long _input_size, int _rs) {
 			pthread_mutex_unlock(&start_mt);
 			sem_post(&q_sem);
 		}
-
+		//
 		// wait signal
 		sem_wait(&terminated_sem);
 
@@ -202,14 +199,13 @@ _range (char * _input_path, long _input_size, int _rs) {
 				exit(1);
 			}
 
-			for (int i = 0; i < THREAD_N; i++) {
-				fclose(in_fps[i]);
-
-				in_fps[i] = fopen(fail_path, "rb");
-				in_fds[i] = fileno(in_fps[i]);
-			}
 
 			free(_input_path);
+
+		
+			for (int i = 0; i < THREAD_N; i++) {
+				remove(input_path_arr[i]);
+			}
 
 			fprintf(stderr, "last minimized: %s, %d\n", fail_path, input_size-rs);
 			return _range(fail_path, (input_size-rs), MIN(rs, (input_size-rs-1)));
@@ -219,10 +215,10 @@ _range (char * _input_path, long _input_size, int _rs) {
 
 
 	for (int i = 0; i < THREAD_N; i++) {
-		fclose(in_fps[i]);
+		remove(input_path_arr[i]);
 	}
 
-	return input_path;
+	return _input_path;
 
 }
 char *
@@ -238,11 +234,10 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 	pthread_mutex_init(&find_mt, NULL);
 
 	fail_arr = malloc(sizeof(char*)*fail_max);
+	input_path_arr = malloc(sizeof(char*)*THREAD_N);
 
 	//fprintf(stderr, "1 input_path: %s \n", _input_path);
 	long input_size = byte_count_file(_input_path);
-
-	null_fp = fopen("/dev/null", "wb");
 
 	pthread_t p_threads[THREAD_N];
 
@@ -250,12 +245,15 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 	init_queue(q);
 	for (int i = 0; i < THREAD_N; i++) {
 
-		out_files[i] = malloc(sizeof(32));
+		out_files[i] = malloc(sizeof(char) * 32);
                 sprintf(out_files[i], "thread%d", i);
-                out_fps[i] = fopen(out_files[i], "wb");
-                out_fds[i] = fileno(out_fps[i]);
 
-		pthread_create(&p_threads[i], NULL, test_range, (void *) i);
+		input_path_arr[i] = malloc(sizeof(char) * 32);
+		sprintf(input_path_arr[i], "origin_input%d", i);
+
+		struct pthread_data * p_data = malloc(sizeof(struct pthread_data));
+		p_data->thread_idx = i;
+		pthread_create(&p_threads[i], NULL, test_range, (void*) p_data);
 	}
 
 
@@ -268,13 +266,15 @@ range (char * _program_path, char * _input_path, char * _err_msg) {
 	pthread_mutex_destroy(&end_mt);
 	pthread_mutex_destroy(&find_mt);
 
-	for (int i = 0; i < THREAD_N; i++) {
-
-		fclose(out_fps[i]);
-	}
-	fclose(null_fp);
 	free(fail_arr);
 
+	for (int i = 0; i < THREAD_N; i++) {
+
+		free(out_files[i]);
+		free(input_path_arr[i]);
+	}
+
+	free(input_path_arr);
 
 
 	return ret_path;
@@ -431,3 +431,4 @@ pop_queue (struct queue_t * q) {
 	q->count--;
 	return ptr;
 }
+

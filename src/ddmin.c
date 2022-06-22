@@ -292,7 +292,7 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
 
 	FILE * t_fp = fopen(stderr_path, "wb");
 	if (t_fp == 0x0) {
-                fprintf(stderr, "no: %s \n", stderr_path);
+                fprintf(stderr, "no(t_fp): %s \n", stderr_path);
                 perror("test_buffer_overflow()");
                 exit(1);
         }
@@ -309,7 +309,7 @@ test_buffer_overflow_thread (char * program_path, char * input_seq_path, char * 
 
         FILE * fp = fopen(stderr_path, "rb");
 	if (fp == 0x0) {
-		fprintf(stderr, "no: %s \n", stderr_path);
+		fprintf(stderr, "no(fp): %s \n", stderr_path);
 		perror("test_buffer_overflow()");
 		exit(1);
 	}
@@ -538,7 +538,8 @@ ddmin_dir (char * program_path, char * input_dir, char * err_msg, char * exe_dir
 
 	return minimized_fname;
 }
-int
+
+void
 copy (const char *src, const char *dst) {
 	int src_fd, dst_fd;
 	struct stat srcstat;
@@ -571,5 +572,4 @@ copy (const char *src, const char *dst) {
 	close(src_fd);
 	close(dst_fd);
 
-	return 0;
 }
