@@ -10,7 +10,7 @@ test_buffer_overflow (char * program_path, char * input_seq_path, char * err_msg
 long
 byte_count_file (char * path);
 
-int
+void
 copy (const char *src, const char *dst);
 
 int

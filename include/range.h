@@ -1,4 +1,4 @@
-#define THREAD_N 8
+#define THREAD_N 4
 
 struct pthread_data {
 	/*global*/
